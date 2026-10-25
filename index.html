@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة أخصائي تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية - السحابي</title>
+    
+    <!-- مكتبات Firebase السحابية -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #0284c7;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* شاشة تسجيل الدخول */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .login-card p {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 24px;
+        }
+
+        .login-form-group {
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .login-form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .login-form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-login:hover {
+            background-color: #172554;
+        }
+
+        .login-error {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* النظام الرئيسي */
+        #app-container {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: fixed;
+            height: 100vh;
+            right: 0;
+            top: 0;
+        }
+
+        .brand h2 {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .nav-item.logout {
+            color: #fca5a5;
+            margin-top: auto;
+        }
+
+        .main-content {
+            margin-right: 300px;
+            flex: 1;
+            padding: 32px;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .status-badge {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card.interactive {
+            cursor: pointer;
+        }
+
+        .stat-card.interactive:hover {
+            transform: translateY(-4px);
+            border-color: #ef4444;
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.15);
+        }
+
+        .stat-card h3 {
+            font-size: 28px;
+            color: var(--primary-color);
+        }
+
+        .dashboard-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .quick-action-btn {
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
+        }
+
+        .quick-action-btn:hover {
+            background: #0f172a;
+            transform: translateY(-2px);
+        }
+
+        .quick-action-btn.secondary {
+            background: #0284c7;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+        }
+
+        .infographic-container {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .infographic-container h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-size: 17px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .horizontal-bar-item {
+            margin-bottom: 12px;
+            background: #ffffff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .horizontal-bar-item:hover {
+            transform: translateX(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .bar-header strong {
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rank-badge {
+            background: #f1f5f9;
+            color: #475569;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .bar-track {
+            width: 100%;
+            background-color: #f1f5f9;
+            border-radius: 10px;
+            height: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .btn-submit {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+        }
+
+        .btn-count {
+            background-color: #16a34a;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .btn-delete {
+            background-color: #475569;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #94a3b8;
+        }
+        .badge-yes { background-color: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+        .badge-no { background-color: #f0fdf4; color: #16a34a; border-color: #86efac; }
+        .badge-count { background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-size: 13px; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .followup-alert-card {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h2>🎓 نظام إدارة أخصائي التقويم</h2>
+            <p>الرجاء تسجيل الدخول للمتابعة</p>
+            <form id="login-form" onsubmit="executeLogin(event)">
+                <div class="login-form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم">
+                </div>
+                <div class="login-form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور">
+                </div>
+                <button type="submit" class="btn-login">تسجيل الدخول</button>
+                <div id="login-error" class="login-error">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة للزيارات التي تحتاج إلى متابعة -->
+    <div id="followup-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>⚠️ المدارس والزيارات التي تتطلب متابعة لاحقة</h3>
+            <div id="followup-modal-body" style="margin-top: 12px;"></div>
+            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                <button type="button" class="btn-submit" style="margin-top:0;" onclick="closeFollowupModal()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة لإدخال عدد الزيارات -->
+    <div id="visits-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width:400px;">
+            <h3 id="modal-title">تعديل عدد الزيارات</h3>
+            <div class="form-group">
+                <label>أدخل إجمالي عدد الزيارات المستهدفة:</label>
+                <input type="number" id="modal-visits-input" min="0" placeholder="0">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                <button type="button" class="btn-submit" style="margin-top:0;" onclick="confirmVisitsUpdate()">💾 حفظ</button>
+                <button type="button" class="btn-delete" onclick="closeVisitsModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- النظام الرئيسي -->
+    <div id="app-container">
+        <div class="sidebar">
+            <div class="brand">
+                <h2>🎓 نظام إدارة أخصائي تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="showTab('dashboard', this)">📊 لوحة التحكم والمؤشرات</li>
+                <li class="nav-item" onclick="showTab('specialists', this)">👥 إدارة موظفي القسم</li>
+                <li class="nav-item" onclick="showTab('visits', this)">📝 ملاحظات وتوصيات الزيارات</li>
+                <li class="nav-item logout" onclick="logout()">🚪 تسجيل الخروج</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1 id="page-title">لوحة التحكم والمؤشرات</h1>
+                    <p>قسم تعلم مواد العلوم الإنسانية والمهارات الفردية</p>
+                </div>
+                <div>
+                    <span class="status-badge">🟢 متصل بالسحابة أونلاين</span>
+                </div>
+            </div>
+
+            <!-- 1. لوحة التحكم والمؤشرات (Dashboard) -->
+            <div id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="stat-count">0</h3>
+                        <p>إجمالي موظفي القسم</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="stat-visits-count">0</h3>
+                        <p>إجمالي الزيارات المسجلة</p>
+                    </div>
+                    <div class="stat-card interactive" onclick="openFollowupModal()">
+                        <h3 id="stat-followup-count" style="color: #dc2626;">0</h3>
+                        <p style="font-weight: bold; color: #dc2626;">زيارات تتطلب متابعة ⚠️</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>100%</h3>
+                        <p>جاهزية النظام</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-quick-actions">
+                    <button class="quick-action-btn" onclick="showTab('specialists')">
+                        ➕ إضافة / تعديل عدد زيارات المشرفين
+                    </button>
+                    <button class="quick-action-btn secondary" onclick="showTab('visits')">
+                        📝 تسجيل ملاحظات زيارة مدرسية
+                    </button>
+                </div>
+
+                <div class="infographic-container" style="border-right: 4px solid #ef4444;">
+                    <h3 style="color: #dc2626;">
+                        <span>⚠️ مؤشر المدارس التي تحتاج إلى متابعة عاجلة</span>
+                        <span id="followup-badge-summary" style="font-size: 12px; background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px;">0 مدارس</span>
+                    </h3>
+                    <div id="dashboard-followup-list"></div>
+                </div>
+
+                <div class="infographic-container">
+                    <h3>
+                        <span>📊 رسم بياني تفاعلي: توزيع المزارات الميدانية حسَب المشرفين</span>
+                    </h3>
+                    <div id="horizontal-infographic-body"></div>
+                </div>
+            </div>
+
+            <!-- 2. قسم الموظفين والمشرفين -->
+            <div id="specialists" class="tab-content">
+                <div class="form-card">
+                    <h3>➕ إضافة موظف أو أخصائي جديد</h3>
+                    <form id="add-spec-form" onsubmit="addSpecialist(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>الرقم الوظيفي</label>
+                                <input type="text" id="spec-id" required placeholder="مثال: 1696508">
+                            </div>
+                            <div class="form-group">
+                                <label>اسم الموظف الثلاثي</label>
+                                <input type="text" id="spec-name" required placeholder="الاسم كاملاً">
+                            </div>
+                            <div class="form-group">
+                                <label>المسمى الوظيفي والتخصص</label>
+                                <input type="text" id="spec-subject" required placeholder="مثال: أخصائي تقويم مادة...">
+                            </div>
+                            <div class="form-group">
+                                <label>عدد الزيارات الإضافية / المبدئية</label>
+                                <input type="number" id="spec-initial-visits" min="0" value="0" placeholder="0">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">💾 حفظ وإضافة الموظف سحابياً</button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <h3>👥 قائمة موظفي وأخصائيي القسم (الرسمية)</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرقم الوظيفي</th>
+                                <th>الاسم</th>
+                                <th>المسمى الوظيفي / التخصص</th>
+                                <th>إجمالي الزيارات</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="specialists-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. قسم ملاحظات وتوصيات الزيارات الميدانية -->
+            <div id="visits" class="tab-content">
+                <div class="form-card">
+                    <h3 id="visit-form-title">📝 إضافة ملاحظات وتوصيات زيارة جديدة</h3>
+                    <form id="add-visit-form" onsubmit="saveVisitForm(event)">
+                        <input type="hidden" id="edit-visit-index" value="-1">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>الموظف / الأخصائي المسؤول</label>
+                                <select id="visit-spec" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>المدرسة المزارة</label>
+                                <input type="text" id="visit-school" required placeholder="اسم المدرسة">
+                            </div>
+                            <div class="form-group">
+                                <label>المعلم المزار</label>
+                                <input type="text" id="visit-teacher" required placeholder="اسم المعلم">
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ الزيارة</label>
+                                <input type="date" id="visit-date" required>
+                            </div>
+                            <div class="form-group" style="grid-column: span 2;">
+                                <label>نوع الملاحظة / تفاصيل التقويم والملاحظات</label>
+                                <textarea id="visit-notes" rows="3" required placeholder="اكتب ملاحظات الزيارة التفصيلية هنا..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>هل يحتاج إلى متابعة لاحقة؟</label>
+                                <select id="visit-followup">
+                                    <option value="نعم">نعم، يحتاج متابعة</option>
+                                    <option value="لا">لا، مكتمل</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-save-visit" class="btn-submit">💾 حفظ وإرسال الملاحظات سحابياً</button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <h3>📋 سجل زيارات وملاحظات المدارس التفصيلية</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الموظف المسؤول</th>
+                                <th>المدرسة</th>
+                                <th>المعلم</th>
+                                <th>التاريخ</th>
+                                <th>الملاحظات</th>
+                                <th>يحتاج متابعة؟</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visits-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // إعدادات Firebase الرسمية المحدثة
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqZ63RIICnD0m_bA1MjDgdfzvHySRhyg8",
+            authDomain: "my-dashboard-d7600.firebaseapp.com",
+            databaseURL: "https://my-dashboard-d7600-default-rtdb.firebaseio.com",
+            projectId: "my-dashboard-d7600",
+            storageBucket: "my-dashboard-d7600.appspot.com",
+            messagingSenderId: "727225174282",
+            appId: "1:727225174282:web:bb2d7eb24023c0b11452f3",
+            measurementId: "G-KSH1KGZ7TE"
+        };
+
+        // تهيئة السحابة
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const chartGradients = [
+            'linear-gradient(90deg, #ec4899 0%, #8b5cf6 100%)',
+            'linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%)',
+            'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+            'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
+            'linear-gradient(90deg, #6366f1 0%, #4f46e5 100%)'
+        ];
+
+        let specialists = [];
+        let visits = [];
+        let selectedSpecIndex = -1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            db.ref('appData').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    specialists = data.specialists || [];
+                    visits = data.visits || [];
+                }
+                renderAll();
+            });
+        });
+
+        function syncToFirebase() {
+            db.ref('appData').set({
+                specialists: specialists,
+                visits: visits
+            });
+        }
+
+        function executeLogin(event) {
+            if (event) event.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('login-error');
+
+            if (user === 'admin' && pass === 'admin') {
+                errorDiv.style.display = 'none';
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                renderAll();
+            } else {
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                document.getElementById('app-container').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+            }
+        }
+
+        function renderAll() {
+            renderSpecialists();
+            renderVisits();
+            renderDashboardStats();
+            renderDashboardFollowupList();
+        }
+
+        function getSpecialistVisitsCount(spec) {
+            const loggedVisits = visits.filter(v => v.specialist === spec.name).length;
+            const custom = parseInt(spec.customVisits) || 0;
+            return loggedVisits + custom;
+        }
+
+        function renderSpecialists() {
+            const tbody = document.getElementById('specialists-table-body');
+            const select = document.getElementById('visit-spec');
+            if (!tbody || !select) return;
+
+            tbody.innerHTML = '';
+            select.innerHTML = '';
+
+            specialists.forEach((spec, index) => {
+                const totalCount = getSpecialistVisitsCount(spec);
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${spec.id}</td>
+                        <td><strong>${spec.name}</strong></td>
+                        <td>${spec.subject}</td>
+                        <td><span class="badge badge-count">📊 ${totalCount} زيارة</span></td>
+                        <td>
+                            <button class="btn-count" onclick="openVisitsModal(${index})">➕ تعديل الزيارات</button>
+                            <button class="btn-delete" onclick="deleteSpecialist(${index})">حذف</button>
+                        </td>
+                    </tr>
+                `;
+                select.innerHTML += `<option value="${spec.name}">${spec.name} (${spec.subject})</option>`;
+            });
+            document.getElementById('stat-count').innerText = specialists.length;
+        }
+
+        function openVisitsModal(index) {
+            selectedSpecIndex = index;
+            const spec = specialists[index];
+            document.getElementById('modal-title').innerText = `إدخال عدد الزيارات: ${spec.name}`;
+            document.getElementById('modal-visits-input').value = getSpecialistVisitsCount(spec);
+            document.getElementById('visits-modal').style.display = 'flex';
+        }
+
+        function closeVisitsModal() {
+            document.getElementById('visits-modal').style.display = 'none';
+        }
+
+        function confirmVisitsUpdate() {
+            if (selectedSpecIndex < 0) return;
+            const inputVal = document.getElementById('modal-visits-input').value;
+            const spec = specialists[selectedSpecIndex];
+            if (inputVal !== '') {
+                const loggedVisits = visits.filter(v => v.specialist === spec.name).length;
+                spec.customVisits = Math.max(0, parseInt(inputVal) - loggedVisits);
+                closeVisitsModal();
+                syncToFirebase();
+            }
+        }
+
+        function openFollowupModal() {
+            const followupVisits = visits.filter(v => v.followup === 'نعم');
+            const modalBody = document.getElementById('followup-modal-body');
+            modalBody.innerHTML = followupVisits.length === 0 ? '🎉 لا توجد زيارات تتطلب متابعة!' : '';
+            followupVisits.forEach(v => {
+                modalBody.innerHTML += `
+                    <div class="followup-alert-card">
+                        <h4>🏫 ${v.school} — المعلم: ${v.teacher}</h4>
+                        <p><strong>المشرف:</strong> ${v.specialist} | <strong>التاريخ:</strong> ${v.date}</p>
+                        <p><strong>الملاحظات:</strong> ${v.notes}</p>
+                    </div>
+                `;
+            });
+            document.getElementById('followup-modal').style.display = 'flex';
+        }
+
+        function closeFollowupModal() {
+            document.getElementById('followup-modal').style.display = 'none';
+        }
+
+        function renderDashboardFollowupList() {
+            const container = document.getElementById('dashboard-followup-list');
+            const followupVisits = visits.filter(v => v.followup === 'نعم');
+            document.getElementById('followup-badge-summary').innerText = `${followupVisits.length} مدارس`;
+            if (!container) return;
+
+            if (followupVisits.length === 0) {
+                container.innerHTML = '<p style="color: #16a34a; font-size: 13px; font-weight: bold;">✅ جميع الزيارات مكتملة ولا توجد مدارس تتطلب متابعة حالياً.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            followupVisits.forEach(v => {
+                container.innerHTML += `
+                    <div class="followup-alert-card">
+                        <h4>🏫 مدرسة: ${v.school} (المعلم: ${v.teacher})</h4>
+                        <p>👤 <strong>المشرف المسؤول:</strong> ${v.specialist} | 📅 <strong>التاريخ:</strong> ${v.date}</p>
+                        <p style="margin-top:4px;">📝 <strong>توصيات الزيارة:</strong> ${v.notes}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function renderVisits() {
+            const tbody = document.getElementById('visits-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            visits.forEach((v, index) => {
+                const badge = v.followup === 'نعم' ? '<span class="badge badge-yes">⚠️ نعم</span>' : '<span class="badge badge-no">✅ مكتمل</span>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${v.specialist}</strong></td>
+                        <td>${v.school}</td>
+                        <td>${v.teacher}</td>
+                        <td>${v.date}</td>
+                        <td>${v.notes}</td>
+                        <td>${badge}</td>
+                        <td><button class="btn-delete" onclick="deleteVisit(${index})">🗑️ حذف</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderDashboardStats() {
+            let totalVisitsCount = 0;
+            specialists.forEach(spec => totalVisitsCount += getSpecialistVisitsCount(spec));
+            document.getElementById('stat-visits-count').innerText = totalVisitsCount;
+            document.getElementById('stat-followup-count').innerText = visits.filter(v => v.followup === 'نعم').length;
+
+            const container = document.getElementById('horizontal-infographic-body');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const sorted = [...specialists].map(s => ({...s, count: getSpecialistVisitsCount(s)})).sort((a,b) => b.count - a.count);
+            let maxVisits = sorted[0]?.count || 1;
+
+            sorted.forEach((spec, i) => {
+                const percentage = Math.max(5, Math.round((spec.count / maxVisits) * 100));
+                container.innerHTML += `
+                    <div class="horizontal-bar-item">
+                        <div class="bar-header">
+                            <strong><span class="rank-badge">${i+1}</span> ${spec.name}</strong>
+                            <span style="font-weight: bold; color: #1e3a8a;">${spec.count} زيارة</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: ${percentage}%; background: ${chartGradients[i % chartGradients.length]};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addSpecialist(e) {
+            e.preventDefault();
+            specialists.push({
+                id: document.getElementById('spec-id').value,
+                name: document.getElementById('spec-name').value,
+                subject: document.getElementById('spec-subject').value,
+                customVisits: parseInt(document.getElementById('spec-initial-visits').value) || 0
+            });
+            syncToFirebase();
+            document.getElementById('add-spec-form').reset();
+        }
+
+        function saveVisitForm(e) {
+            e.preventDefault();
+            visits.push({
+                specialist: document.getElementById('visit-spec').value,
+                school: document.getElementById('visit-school').value,
+                teacher: document.getElementById('visit-teacher').value,
+                date: document.getElementById('visit-date').value,
+                notes: document.getElementById('visit-notes').value,
+                followup: document.getElementById('visit-followup').value
+            });
+            syncToFirebase();
+            document.getElementById('add-visit-form').reset();
+            showTab('dashboard');
+        }
+
+        function deleteSpecialist(index) {
+            if (confirm('حذف الموظف؟')) {
+                specialists.splice(index, 1);
+                syncToFirebase();
+            }
+        }
+
+        function deleteVisit(index) {
+            if (confirm('حذف الزيارة؟')) {
+                visits.splice(index, 1);
+                syncToFirebase();
+            }
+        }
+
+        function showTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (element) element.classList.add('active');
+        }
+    </script>
+</body>
+</html>
