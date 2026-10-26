@@ -29,13 +29,75 @@
         }
 
         body {
-            display: flex;
             background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
         }
 
-        /* ----- الشريط الجانبي Sidebar ----- */
+        /* ----- شاشة تسجيل الدخول ----- */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #ffffff;
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-card .brand-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .login-card h2 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+        }
+
+        .login-card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .login-form .input-box {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+
+        .login-form label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .login-error {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        /* ----- لوحة التحكم الرئيسية ----- */
+        #app-screen {
+            display: none;
+            min-height: 100vh;
+        }
+
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--primary-color);
@@ -53,7 +115,7 @@
         }
 
         .sidebar .brand {
-            padding: 0 24px 24px;
+            padding: 0 24px 20px;
             border-bottom: 1px solid #334155;
             display: flex;
             align-items: center;
@@ -80,8 +142,9 @@
 
         .sidebar-menu {
             list-style: none;
-            margin-top: 24px;
+            margin-top: 20px;
             padding: 0 12px;
+            flex: 1;
         }
 
         .sidebar-menu li {
@@ -113,10 +176,36 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
         }
 
-        /* ----- محتوى الصفحة Main Content ----- */
+        .sidebar-footer {
+            padding: 0 12px;
+            border-top: 1px solid #334155;
+            padding-top: 16px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger-color);
+            color: #ffffff;
+        }
+
         .main-content {
             margin-right: var(--sidebar-width);
-            flex: 1;
             padding: 32px;
             max-width: calc(100vw - var(--sidebar-width));
         }
@@ -270,12 +359,6 @@
             gap: 6px;
         }
 
-        .input-box label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
         input, select, textarea {
             width: 100%;
             padding: 12px;
@@ -317,6 +400,7 @@
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
@@ -489,7 +573,7 @@
             .sidebar {
                 width: 80px;
             }
-            .sidebar .brand-title, .sidebar-menu li a span:last-child {
+            .sidebar .brand-title, .sidebar-menu li a span:last-child, .btn-logout span:last-child {
                 display: none;
             }
             .sidebar .brand {
@@ -506,273 +590,302 @@
 </head>
 <body>
 
-    <!-- الشريط الجانبي (Sidebar) -->
-    <aside class="sidebar">
-        <div class="brand">
+    <!-- 1. شاشة تسجيل الدخول -->
+    <div id="login-screen">
+        <div class="login-card">
             <span class="brand-icon">🎓</span>
-            <div class="brand-title">
-                <h2>موجز</h2>
-                <p>تقويم المواد</p>
-            </div>
+            <h2>موجز - تقويم المواد</h2>
+            <p>تسجيل الدخول إلى لوحة التحكم</p>
+
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="input-box">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                <div class="input-box">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+                <div id="login-error" class="login-error">⚠️ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+                <button type="submit" class="btn-primary" style="width: 100%;">🔑 دخول</button>
+            </form>
         </div>
-        <ul class="sidebar-menu">
-            <li>
-                <a class="nav-link active" onclick="switchTab('dashboard', this)">
-                    <span>📊</span> <span>لوحة المؤشرات</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" onclick="switchTab('employees', this)">
-                    <span>🗂️</span> <span>بيانات الموظفين</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" onclick="switchTab('specialists', this)">
-                    <span>👥</span> <span>إدارة الأخصائيين</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" onclick="switchTab('visits', this)">
-                    <span>📝</span> <span>الزيارات والملاحظات</span>
-                </a>
-            </li>
-            <li>
-                <a class="nav-link" onclick="switchTab('reports', this)">
-                    <span>📈</span> <span>التقارير والإحصائيات</span>
-                </a>
-            </li>
-        </ul>
-    </aside>
+    </div>
 
-    <!-- محتوى الصفحة الرئيسي -->
-    <main class="main-content">
-        <header>
-            <div>
-                <h1>🎓 موجز - أخصائي تقويم المواد</h1>
-                <p>لوحة التحكم والمؤشرات الميدانية التفاعلية</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-reset" onclick="resetAllData()" title="مسح وإعادة ضبط البيانات">🗑️ إعادة ضبط</button>
-                <div class="status-badge">
-                    <span class="status-dot"></span>
-                    حفظ محلي متصل
+    <!-- 2. لوحة التحكم الرئيسية (تظهر بعد الدخول) -->
+    <div id="app-screen">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">🎓</span>
+                <div class="brand-title">
+                    <h2>موجز</h2>
+                    <p>تقويم المواد</p>
                 </div>
             </div>
-        </header>
+            <ul class="sidebar-menu">
+                <li>
+                    <a class="nav-link active" onclick="switchTab('dashboard', this)">
+                        <span>📊</span> <span>لوحة المؤشرات</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" onclick="switchTab('employees', this)">
+                        <span>🗂️</span> <span>بيانات الموظفين</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" onclick="switchTab('specialists', this)">
+                        <span>👥</span> <span>إدارة الأخصائيين</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" onclick="switchTab('visits', this)">
+                        <span>📝</span> <span>الزيارات والملاحظات</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link" onclick="switchTab('reports', this)">
+                        <span>📈</span> <span>التقارير والإحصائيات</span>
+                    </a>
+                </li>
+            </ul>
 
-        <!-- القسم الأول: لوحة المؤشرات -->
-        <section id="dashboard" class="tab-content active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <h3 id="stat-total-staff">0</h3>
-                        <p>إجمالي الأخصائيين المسجلين</p>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="handleLogout()" title="تسجيل الخروج">
+                    <span>🚪</span> <span>تسجيل الخروج</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div>
+                    <h1>🎓 موجز - أخصائي تقويم المواد</h1>
+                    <p>لوحة التحكم والمؤشرات الميدانية التفاعلية</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-reset" onclick="resetAllData()" title="مسح وإعادة ضبط البيانات">🗑️ إعادة ضبط</button>
+                    <div class="status-badge">
+                        <span class="status-dot"></span>
+                        حفظ محلي متصل
                     </div>
-                    <span class="stat-icon">👥</span>
                 </div>
-                <div class="stat-card success">
-                    <div class="stat-info">
-                        <h3 id="stat-total-visits">0</h3>
-                        <p>إجمالي الزيارات المسجلة</p>
+            </header>
+
+            <!-- القسم الأول: لوحة المؤشرات -->
+            <section id="dashboard" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="stat-total-staff">0</h3>
+                            <p>إجمالي الأخصائيين المسجلين</p>
+                        </div>
+                        <span class="stat-icon">👥</span>
                     </div>
-                    <span class="stat-icon">📝</span>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-info">
-                        <h3 id="stat-pending-visits">0</h3>
-                        <p>زيارات تتطلب متابعة ⚠️</p>
+                    <div class="stat-card success">
+                        <div class="stat-info">
+                            <h3 id="stat-total-visits">0</h3>
+                            <p>إجمالي الزيارات المسجلة</p>
+                        </div>
+                        <span class="stat-icon">📝</span>
                     </div>
-                    <span class="stat-icon">🔔</span>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>📊 توزيع الزيارات الميدانية الإجمالي حسب الأخصائيين</h2>
-                <div style="position: relative; height:320px; width:100%">
-                    <canvas id="visitsChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- القسم الثاني: بيانات الموظفين تفصيلياً -->
-        <section id="employees" class="tab-content">
-            <div class="card">
-                <h2>🗂️ بيانات موظفي الأقسام</h2>
-                <p style="color: var(--text-muted); margin-bottom: 20px;">اختر القسم لعرض سجل بيانات موظفيه وأخصائييه بشكل منفصل:</p>
-                
-                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-                    <button class="dept-toggle-btn active" id="btn-humanities" onclick="toggleDepartment('humanities')">
-                        🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية
-                    </button>
-                    <button class="dept-toggle-btn" id="btn-applied" onclick="toggleDepartment('applied')">
-                        🔬 قسم تقويم تعلم مواد العلوم التطبيقية
-                    </button>
+                    <div class="stat-card warning">
+                        <div class="stat-info">
+                            <h3 id="stat-pending-visits">0</h3>
+                            <p>زيارات تتطلب متابعة ⚠️</p>
+                        </div>
+                        <span class="stat-icon">🔔</span>
+                    </div>
                 </div>
 
-                <div id="dept-humanities-section">
-                    <h3 style="color: var(--primary-color); margin-bottom: 16px;">🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</h3>
+                <div class="card">
+                    <h2>📊 توزيع الزيارات الميدانية الإجمالي حسب الأخصائيين</h2>
+                    <div style="position: relative; height:320px; width:100%">
+                        <canvas id="visitsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- القسم الثاني: بيانات الموظفين تفصيلياً -->
+            <section id="employees" class="tab-content">
+                <div class="card">
+                    <h2>🗂️ بيانات موظفي الأقسام</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">اختر القسم لعرض سجل بيانات موظفيه وأخصائييه بشكل منفصل:</p>
+                    
+                    <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <button class="dept-toggle-btn active" id="btn-humanities" onclick="toggleDepartment('humanities')">
+                            🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية
+                        </button>
+                        <button class="dept-toggle-btn" id="btn-applied" onclick="toggleDepartment('applied')">
+                            🔬 قسم تقويم تعلم مواد العلوم التطبيقية
+                        </button>
+                    </div>
+
+                    <div id="dept-humanities-section">
+                        <h3 style="color: var(--primary-color); margin-bottom: 16px;">🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الرقم الوظيفي</th>
+                                        <th>الاسم</th>
+                                        <th>المسمى الوظيفي</th>
+                                        <th>التخصص</th>
+                                        <th>الإيميل</th>
+                                        <th>الهاتف</th>
+                                        <th>الدرجة المالية</th>
+                                        <th>المؤهل الدراسي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="humanities-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="dept-applied-section" style="display: none;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 16px;">🔬 قسم تقويم تعلم مواد العلوم التطبيقية</h3>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>الرقم الوظيفي</th>
+                                        <th>الاسم</th>
+                                        <th>المسمى الوظيفي</th>
+                                        <th>التخصص</th>
+                                        <th>الإيميل</th>
+                                        <th>الهاتف</th>
+                                        <th>الدرجة المالية</th>
+                                        <th>المؤهل الدراسي</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="applied-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- القسم الثالث: إدارة الأخصائيين -->
+            <section id="specialists" class="tab-content">
+                <div class="card">
+                    <h2>👥 إضافة أخصائي جديد</h2>
+                    <form id="add-staff-form" onsubmit="handleAddStaff(event)">
+                        <div class="form-group">
+                            <div class="input-box">
+                                <label>الرقم الوظيفي</label>
+                                <input type="text" id="staff-id" placeholder="مثال: 16143371" required>
+                            </div>
+                            <div class="input-box">
+                                <label>الاسم الكامل</label>
+                                <input type="text" id="staff-name" placeholder="اسم الأخصائي" required>
+                            </div>
+                            <div class="input-box">
+                                <label>التخصص / المادة</label>
+                                <input type="text" id="staff-dept" placeholder="مثال: فيزياء / رياضيات" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">➕ حفظ الموظف</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📋 قائمة الأخصائيين المسجلين</h2>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
                                     <th>الرقم الوظيفي</th>
-                                    <th>الاسم</th>
-                                    <th>المسمى الوظيفي</th>
+                                    <th>الاسم الكامل</th>
                                     <th>التخصص</th>
-                                    <th>الإيميل</th>
-                                    <th>الهاتف</th>
-                                    <th>الدرجة المالية</th>
-                                    <th>المؤهل الدراسي</th>
+                                    <th>إجراء</th>
                                 </tr>
                             </thead>
-                            <tbody id="humanities-table-body"></tbody>
+                            <tbody id="staff-table-body">
+                                <!-- تضاف البيانات هنا -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
+            </section>
 
-                <div id="dept-applied-section" style="display: none;">
-                    <h3 style="color: var(--primary-color); margin-bottom: 16px;">🔬 قسم تقويم تعلم مواد العلوم التطبيقية</h3>
+            <!-- القسم الرابع: الزيارات والملاحظات -->
+            <section id="visits" class="tab-content">
+                <div class="card">
+                    <h2>📝 تسجيل زيارة ميدانية جديدة</h2>
+                    <form id="add-visit-form" onsubmit="handleAddVisit(event)">
+                        <div class="form-group">
+                            <div class="input-box">
+                                <label>الأخصائي الزائر</label>
+                                <select id="visit-staff-select" required>
+                                    <option value="">اختر الموظف...</option>
+                                </select>
+                            </div>
+                            <div class="input-box">
+                                <label>اسم المدرسة</label>
+                                <input type="text" id="visit-school" placeholder="اسم المدرسة" required>
+                            </div>
+                            <div class="input-box">
+                                <label>اسم المعلم المزار</label>
+                                <input type="text" id="visit-teacher" placeholder="اسم المعلم" required>
+                            </div>
+                            <div class="input-box">
+                                <label>تاريخ الزيارة</label>
+                                <input type="date" id="visit-date" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-box" style="grid-column: 1 / -1;">
+                                <label>الملاحظات والتوصيات الميدانية</label>
+                                <textarea id="visit-notes" rows="3" placeholder="أدخل ملخص الملاحظات والتوصيات التقويمية..."></textarea>
+                            </div>
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="visit-followup">
+                            تتطلب هذه الزيارة متابعة ميدانية لاحقة
+                        </label>
+                        <br>
+                        <button type="submit" class="btn-primary">💾 تسجيل الزيارة</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📜 سجل الزيارات الميدانية</h2>
                     <div class="table-responsive">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>الرقم الوظيفي</th>
-                                    <th>الاسم</th>
-                                    <th>المسمى الوظيفي</th>
-                                    <th>التخصص</th>
-                                    <th>الإيميل</th>
-                                    <th>الهاتف</th>
-                                    <th>الدرجة المالية</th>
-                                    <th>المؤهل الدراسي</th>
+                                    <th>الأخصائي</th>
+                                    <th>المدرسة</th>
+                                    <th>المعلم</th>
+                                    <th>التاريخ</th>
+                                    <th>حالة المتابعة</th>
+                                    <th>الملاحظات</th>
+                                    <th>إجراء</th>
                                 </tr>
                             </thead>
-                            <tbody id="applied-table-body"></tbody>
+                            <tbody id="visits-table-body">
+                                <!-- تضاف البيانات هنا -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- القسم الثالث: إدارة الأخصائيين -->
-        <section id="specialists" class="tab-content">
-            <div class="card">
-                <h2>👥 إضافة أخصائي جديد</h2>
-                <form id="add-staff-form" onsubmit="handleAddStaff(event)">
-                    <div class="form-group">
-                        <div class="input-box">
-                            <label>الرقم الوظيفي</label>
-                            <input type="text" id="staff-id" placeholder="مثال: 16143371" required>
-                        </div>
-                        <div class="input-box">
-                            <label>الاسم الكامل</label>
-                            <input type="text" id="staff-name" placeholder="اسم الأخصائي" required>
-                        </div>
-                        <div class="input-box">
-                            <label>التخصص / المادة</label>
-                            <input type="text" id="staff-dept" placeholder="مثال: فيزياء / رياضيات" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary">➕ حفظ الموظف</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2>📋 قائمة الأخصائيين المسجلين</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>الرقم الوظيفي</th>
-                                <th>الاسم الكامل</th>
-                                <th>التخصص</th>
-                                <th>إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="staff-table-body">
-                            <!-- تضاف البيانات هنا -->
-                        </tbody>
-                    </table>
+            <!-- القسم الخامس: التقارير والإحصائيات -->
+            <section id="reports" class="tab-content">
+                <div class="filter-section">
+                    <label for="report-filter-select">🔍 تصفية التقارير حسب الأخصائي:</label>
+                    <select id="report-filter-select" onchange="renderSpecialistReports()">
+                        <option value="ALL">عرض جميع الأخصائيين</option>
+                    </select>
                 </div>
-            </div>
-        </section>
 
-        <!-- القسم الرابع: الزيارات والملاحظات -->
-        <section id="visits" class="tab-content">
-            <div class="card">
-                <h2>📝 تسجيل زيارة ميدانية جديدة</h2>
-                <form id="add-visit-form" onsubmit="handleAddVisit(event)">
-                    <div class="form-group">
-                        <div class="input-box">
-                            <label>الأخصائي الزائر</label>
-                            <select id="visit-staff-select" required>
-                                <option value="">اختر الموظف...</option>
-                            </select>
-                        </div>
-                        <div class="input-box">
-                            <label>اسم المدرسة</label>
-                            <input type="text" id="visit-school" placeholder="اسم المدرسة" required>
-                        </div>
-                        <div class="input-box">
-                            <label>اسم المعلم المزار</label>
-                            <input type="text" id="visit-teacher" placeholder="اسم المعلم" required>
-                        </div>
-                        <div class="input-box">
-                            <label>تاريخ الزيارة</label>
-                            <input type="date" id="visit-date" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-box" style="grid-column: 1 / -1;">
-                            <label>الملاحظات والتوصيات الميدانية</label>
-                            <textarea id="visit-notes" rows="3" placeholder="أدخل ملخص الملاحظات والتوصيات التقويمية..."></textarea>
-                        </div>
-                    </div>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="visit-followup">
-                        تتطلب هذه الزيارة متابعة ميدانية لاحقة
-                    </label>
-                    <br>
-                    <button type="submit" class="btn-primary">💾 تسجيل الزيارة</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2>📜 سجل الزيارات الميدانية</h2>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>الأخصائي</th>
-                                <th>المدرسة</th>
-                                <th>المعلم</th>
-                                <th>التاريخ</th>
-                                <th>حالة المتابعة</th>
-                                <th>الملاحظات</th>
-                                <th>إجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="visits-table-body">
-                            <!-- تضاف البيانات هنا -->
-                        </tbody>
-                    </table>
+                <div id="specialists-reports-container" class="specialists-reports-grid">
+                    <!-- يتم توليد كروت ورسوم بيانية لكل أخصائي هنا -->
                 </div>
-            </div>
-        </section>
-
-        <!-- القسم الخامس: التقارير والإحصائيات -->
-        <section id="reports" class="tab-content">
-            <div class="filter-section">
-                <label for="report-filter-select">🔍 تصفية التقارير حسب الأخصائي:</label>
-                <select id="report-filter-select" onchange="renderSpecialistReports()">
-                    <option value="ALL">عرض جميع الأخصائيين</option>
-                </select>
-            </div>
-
-            <div id="specialists-reports-container" class="specialists-reports-grid">
-                <!-- يتم توليد كروت ورسوم بيانية لكل أخصائي هنا -->
-            </div>
-        </section>
-    </main>
+            </section>
+        </main>
+    </div>
 
     <!-- Script / Logic -->
     <script>
@@ -803,7 +916,6 @@
             ...appliedEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }))
         ];
 
-        // التأكد من الفحص التلقائي لعدد الأخصائيين وتحديث القائمة إذا كانت أقل من 16
         let storedStaff = JSON.parse(localStorage.getItem('mojaz_staff'));
         if (!storedStaff || storedStaff.length < 16) {
             storedStaff = allSpecialistsDefault;
@@ -815,11 +927,48 @@
         let mainVisitsChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {
-            initData();
-            renderAll();
-            renderDepartmentTables();
-            initMainChart();
+            checkAuthStatus();
         });
+
+        // التحقق من حالة الدخول عند تحميل الصفحة
+        function checkAuthStatus() {
+            const isLoggedIn = localStorage.getItem('mojaz_logged_in') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'block';
+                initData();
+                renderAll();
+                renderDepartmentTables();
+                initMainChart();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app-screen').style.display = 'none';
+            }
+        }
+
+        // تسجيل الدخول
+        function handleLogin(e) {
+            e.preventDefault();
+            const userVal = document.getElementById('username').value.trim();
+            const passVal = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            if (userVal === 'admin' && passVal === 'admin') {
+                errorEl.style.display = 'none';
+                localStorage.setItem('mojaz_logged_in', 'true');
+                checkAuthStatus();
+            } else {
+                errorEl.style.display = 'block';
+            }
+        }
+
+        // تسجيل الخروج
+        function handleLogout() {
+            if (confirm('هل ترغب في تسجيل الخروج من النظام؟')) {
+                localStorage.removeItem('mojaz_logged_in');
+                checkAuthStatus();
+            }
+        }
 
         function toggleDepartment(deptKey) {
             const humSection = document.getElementById('dept-humanities-section');
