@@ -653,7 +653,7 @@
             </div>
         </section>
 
-        <!-- القسم الثالث: إدارة الأخصائيين (تشمل جميع الأخصائيين من القسمين) -->
+        <!-- القسم الثالث: إدارة الأخصائيين -->
         <section id="specialists" class="tab-content">
             <div class="card">
                 <h2>👥 إضافة أخصائي جديد</h2>
@@ -776,7 +776,6 @@
 
     <!-- Script / Logic -->
     <script>
-        // قائمة موظفي قسم العلوم الإنسانية والمهارات الفردية
         const humanitiesEmployees = [
             { id: "1696508", name: "يوسف بن سليمان بن سالم المفرجي", email: "yosof.mufargi@moe.om", phone: "95250240", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات/حاسوب" },
             { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", email: "sultan.6401@moe.om", phone: "92387160", title: "أخصائي تقويم مادة الرياضة المدرسية ثان", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضة" },
@@ -790,7 +789,6 @@
             { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", email: "salem.94487@moe.om", phone: "95826622", title: "أخصائي تقويم مادة التربية الإسلامية", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "التربية الإسلامية" }
         ];
 
-        // قائمة موظفي قسم العلوم التطبيقية
         const appliedEmployees = [
             { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", email: "ibrahim.alshabibi@moe.om", phone: "99237027", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" },
             { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", email: "almughari.fs@moe.om", phone: "98002099", title: "أخصائي تقويم مادة الفيزياء أول", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "فيزياء" },
@@ -800,13 +798,19 @@
             { id: "1682354", name: "علي بن صابح بن سالم بني عرابه", email: "ali.baniaraba@moe.om", phone: "92385401", title: "أخصائي تقويم مادة الرياضيات أول", grade: "السادسة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" }
         ];
 
-        // دمج أخصائيي القسمين معاً لإدراجهم تلقائياً في قائمة الأخصائيين المسجلين
         const allSpecialistsDefault = [
             ...humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty })),
             ...appliedEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }))
         ];
 
-        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || allSpecialistsDefault;
+        // التأكد من الفحص التلقائي لعدد الأخصائيين وتحديث القائمة إذا كانت أقل من 16
+        let storedStaff = JSON.parse(localStorage.getItem('mojaz_staff'));
+        if (!storedStaff || storedStaff.length < 16) {
+            storedStaff = allSpecialistsDefault;
+            localStorage.setItem('mojaz_staff', JSON.stringify(storedStaff));
+        }
+
+        let staffList = storedStaff;
         let visitsList = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
         let mainVisitsChart = null;
 
@@ -837,7 +841,6 @@
         }
 
         function renderDepartmentTables() {
-            // جدول العلوم الإنسانية
             const humTbody = document.getElementById('humanities-table-body');
             humTbody.innerHTML = humanitiesEmployees.map(e => `
                 <tr>
@@ -852,7 +855,6 @@
                 </tr>
             `).join('');
 
-            // جدول العلوم التطبيقية
             const appTbody = document.getElementById('applied-table-body');
             appTbody.innerHTML = appliedEmployees.map(e => `
                 <tr>
