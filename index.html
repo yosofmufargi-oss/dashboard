@@ -187,7 +187,6 @@
             background-color: #fda4af;
         }
 
-        /* التحكم في إظهار الأقسام */
         .tab-content {
             display: none;
             animation: fadeIn 0.3s ease-in-out;
@@ -202,7 +201,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* بطاقات الإحصائيات */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -242,7 +240,6 @@
             opacity: 0.8;
         }
 
-        /* الجداول والنماذج */
         .card {
             background: var(--card-bg);
             padding: 28px;
@@ -327,7 +324,6 @@
             background-color: #1d4ed8;
         }
 
-        /* أزرار اختيار القسم */
         .dept-toggle-btn {
             background-color: #e2e8f0;
             color: #475569;
@@ -346,7 +342,6 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
-        /* الجداول */
         .table-responsive {
             overflow-x: auto;
             margin-top: 20px;
@@ -565,7 +560,7 @@
             </div>
         </header>
 
-        <!-- القسم الأول: لوحة المؤشرات والرسم البياني العام -->
+        <!-- القسم الأول: لوحة المؤشرات -->
         <section id="dashboard" class="tab-content active">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -599,13 +594,12 @@
             </div>
         </section>
 
-        <!-- القسم الجديد: بيانات الموظفين من الملفين -->
+        <!-- القسم الثاني: بيانات الموظفين تفصيلياً -->
         <section id="employees" class="tab-content">
             <div class="card">
                 <h2>🗂️ بيانات موظفي الأقسام</h2>
                 <p style="color: var(--text-muted); margin-bottom: 20px;">اختر القسم لعرض سجل بيانات موظفيه وأخصائييه بشكل منفصل:</p>
                 
-                <!-- أزرار التبديل بين القسمين في وسط الصفحة -->
                 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
                     <button class="dept-toggle-btn active" id="btn-humanities" onclick="toggleDepartment('humanities')">
                         🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية
@@ -615,7 +609,6 @@
                     </button>
                 </div>
 
-                <!-- جدول بيانات قسم العلوم الإنسانية -->
                 <div id="dept-humanities-section">
                     <h3 style="color: var(--primary-color); margin-bottom: 16px;">🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</h3>
                     <div class="table-responsive">
@@ -637,7 +630,6 @@
                     </div>
                 </div>
 
-                <!-- جدول بيانات قسم العلوم التطبيقية -->
                 <div id="dept-applied-section" style="display: none;">
                     <h3 style="color: var(--primary-color); margin-bottom: 16px;">🔬 قسم تقويم تعلم مواد العلوم التطبيقية</h3>
                     <div class="table-responsive">
@@ -661,7 +653,7 @@
             </div>
         </section>
 
-        <!-- القسم الثالث: إدارة الأخصائيين -->
+        <!-- القسم الثالث: إدارة الأخصائيين (تشمل جميع الأخصائيين من القسمين) -->
         <section id="specialists" class="tab-content">
             <div class="card">
                 <h2>👥 إضافة أخصائي جديد</h2>
@@ -677,7 +669,7 @@
                         </div>
                         <div class="input-box">
                             <label>التخصص / المادة</label>
-                            <input type="text" id="staff-dept" placeholder="مثال: رياضة" required>
+                            <input type="text" id="staff-dept" placeholder="مثال: فيزياء / رياضيات" required>
                         </div>
                     </div>
                     <button type="submit" class="btn-primary">➕ حفظ الموظف</button>
@@ -767,7 +759,7 @@
             </div>
         </section>
 
-        <!-- القسم الخامس: التقارير والإحصائيات وتفاصيل الأخصائيين -->
+        <!-- القسم الخامس: التقارير والإحصائيات -->
         <section id="reports" class="tab-content">
             <div class="filter-section">
                 <label for="report-filter-select">🔍 تصفية التقارير حسب الأخصائي:</label>
@@ -784,7 +776,7 @@
 
     <!-- Script / Logic -->
     <script>
-        // بيانات قسم العلوم الإنسانية والمهارات الفردية المأخوذة من الملف المرفق
+        // قائمة موظفي قسم العلوم الإنسانية والمهارات الفردية
         const humanitiesEmployees = [
             { id: "1696508", name: "يوسف بن سليمان بن سالم المفرجي", email: "yosof.mufargi@moe.om", phone: "95250240", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات/حاسوب" },
             { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", email: "sultan.6401@moe.om", phone: "92387160", title: "أخصائي تقويم مادة الرياضة المدرسية ثان", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضة" },
@@ -798,7 +790,7 @@
             { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", email: "salem.94487@moe.om", phone: "95826622", title: "أخصائي تقويم مادة التربية الإسلامية", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "التربية الإسلامية" }
         ];
 
-        // بيانات قسم العلوم التطبيقية المأخوذة من الملف المرفق
+        // قائمة موظفي قسم العلوم التطبيقية
         const appliedEmployees = [
             { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", email: "ibrahim.alshabibi@moe.om", phone: "99237027", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" },
             { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", email: "almughari.fs@moe.om", phone: "98002099", title: "أخصائي تقويم مادة الفيزياء أول", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "فيزياء" },
@@ -808,7 +800,13 @@
             { id: "1682354", name: "علي بن صابح بن سالم بني عرابه", email: "ali.baniaraba@moe.om", phone: "92385401", title: "أخصائي تقويم مادة الرياضيات أول", grade: "السادسة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" }
         ];
 
-        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }));
+        // دمج أخصائيي القسمين معاً لإدراجهم تلقائياً في قائمة الأخصائيين المسجلين
+        const allSpecialistsDefault = [
+            ...humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty })),
+            ...appliedEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }))
+        ];
+
+        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || allSpecialistsDefault;
         let visitsList = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
         let mainVisitsChart = null;
 
@@ -876,10 +874,10 @@
         }
 
         function resetAllData() {
-            if (confirm('هل أنت تأكد من رغبتك في إعادة ضبط البيانات إلى القائمة الافتراضية؟')) {
+            if (confirm('هل أنت تأكد من رغبتك في إعادة ضبط البيانات إلى القائمة الافتراضية للقسمين؟')) {
                 localStorage.removeItem('mojaz_staff');
                 localStorage.removeItem('mojaz_visits');
-                staffList = humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }));
+                staffList = [...allSpecialistsDefault];
                 visitsList = [];
                 saveData();
                 renderAll();
