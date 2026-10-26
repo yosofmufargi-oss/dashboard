@@ -317,7 +317,7 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 0.95rem;
-            transition: background 0.2s;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -325,6 +325,25 @@
 
         button.btn-primary:hover {
             background-color: #1d4ed8;
+        }
+
+        /* أزرار اختيار القسم */
+        .dept-toggle-btn {
+            background-color: #e2e8f0;
+            color: #475569;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dept-toggle-btn.active {
+            background-color: var(--secondary-color);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
         }
 
         /* الجداول */
@@ -343,6 +362,7 @@
             padding: 14px;
             border-bottom: 1px solid #e2e8f0;
             font-size: 0.9rem;
+            white-space: nowrap;
         }
 
         table th {
@@ -388,7 +408,6 @@
             color: var(--text-muted);
         }
 
-        /* فلتر وشبكة أداء الأخصائيين التفصيلية */
         .filter-section {
             display: flex;
             align-items: center;
@@ -508,6 +527,11 @@
                 </a>
             </li>
             <li>
+                <a class="nav-link" onclick="switchTab('employees', this)">
+                    <span>🗂️</span> <span>بيانات الموظفين</span>
+                </a>
+            </li>
+            <li>
                 <a class="nav-link" onclick="switchTab('specialists', this)">
                     <span>👥</span> <span>إدارة الأخصائيين</span>
                 </a>
@@ -575,7 +599,69 @@
             </div>
         </section>
 
-        <!-- القسم الثاني: إدارة الأخصائيين -->
+        <!-- القسم الجديد: بيانات الموظفين من الملفين -->
+        <section id="employees" class="tab-content">
+            <div class="card">
+                <h2>🗂️ بيانات موظفي الأقسام</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">اختر القسم لعرض سجل بيانات موظفيه وأخصائييه بشكل منفصل:</p>
+                
+                <!-- أزرار التبديل بين القسمين في وسط الصفحة -->
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button class="dept-toggle-btn active" id="btn-humanities" onclick="toggleDepartment('humanities')">
+                        🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية
+                    </button>
+                    <button class="dept-toggle-btn" id="btn-applied" onclick="toggleDepartment('applied')">
+                        🔬 قسم تقويم تعلم مواد العلوم التطبيقية
+                    </button>
+                </div>
+
+                <!-- جدول بيانات قسم العلوم الإنسانية -->
+                <div id="dept-humanities-section">
+                    <h3 style="color: var(--primary-color); margin-bottom: 16px;">🏛️ قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الرقم الوظيفي</th>
+                                    <th>الاسم</th>
+                                    <th>المسمى الوظيفي</th>
+                                    <th>التخصص</th>
+                                    <th>الإيميل</th>
+                                    <th>الهاتف</th>
+                                    <th>الدرجة المالية</th>
+                                    <th>المؤهل الدراسي</th>
+                                </tr>
+                            </thead>
+                            <tbody id="humanities-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- جدول بيانات قسم العلوم التطبيقية -->
+                <div id="dept-applied-section" style="display: none;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 16px;">🔬 قسم تقويم تعلم مواد العلوم التطبيقية</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الرقم الوظيفي</th>
+                                    <th>الاسم</th>
+                                    <th>المسمى الوظيفي</th>
+                                    <th>التخصص</th>
+                                    <th>الإيميل</th>
+                                    <th>الهاتف</th>
+                                    <th>الدرجة المالية</th>
+                                    <th>المؤهل الدراسي</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applied-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- القسم الثالث: إدارة الأخصائيين -->
         <section id="specialists" class="tab-content">
             <div class="card">
                 <h2>👥 إضافة أخصائي جديد</h2>
@@ -618,7 +704,7 @@
             </div>
         </section>
 
-        <!-- القسم الثالث: الزيارات والملاحظات -->
+        <!-- القسم الرابع: الزيارات والملاحظات -->
         <section id="visits" class="tab-content">
             <div class="card">
                 <h2>📝 تسجيل زيارة ميدانية جديدة</h2>
@@ -681,7 +767,7 @@
             </div>
         </section>
 
-        <!-- القسم الرابع: التقارير والإحصائيات وتفاصيل الأخصائيين -->
+        <!-- القسم الخامس: التقارير والإحصائيات وتفاصيل الأخصائيين -->
         <section id="reports" class="tab-content">
             <div class="filter-section">
                 <label for="report-filter-select">🔍 تصفية التقارير حسب الأخصائي:</label>
@@ -698,50 +784,90 @@
 
     <!-- Script / Logic -->
     <script>
-        // البيانات الافتراضية المضمنة للأخصائيين
-        const defaultStaff = [
-            { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", dept: "رياضة" },
-            { id: "16125123", name: "رحمه محمد خالد علي المسكرية", dept: "اللغة انجليزية" },
-            { id: "1686518", name: "زبانه راشد محمد راشد البوسعيدية", dept: "تاريخ وجغرافيا" },
-            { id: "1686654", name: "اسماء حمود ناصر حمود السناوية", dept: "اللغة العربية" },
-            { id: "16142588", name: "راشد بن محمد بن سالم الحارثي", dept: "جغرافيا" },
-            { id: "16143513", name: "نسرين بنت حمد سيف الرواحية", dept: "الجغرافيا" },
-            { id: "16175869", name: "وردة بنت مبروك سويدان الحجرية", dept: "فنون تشكيلية" },
-            { id: "1686397", name: "محمد بن سالم بن محمد اليزيدي", dept: "التربية الإسلامية" },
-            { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", dept: "التربية الإسلامية" }
+        // بيانات قسم العلوم الإنسانية والمهارات الفردية المأخوذة من الملف المرفق
+        const humanitiesEmployees = [
+            { id: "1696508", name: "يوسف بن سليمان بن سالم المفرجي", email: "yosof.mufargi@moe.om", phone: "95250240", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات/حاسوب" },
+            { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", email: "sultan.6401@moe.om", phone: "92387160", title: "أخصائي تقويم مادة الرياضة المدرسية ثان", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضة" },
+            { id: "16125123", name: "رحمه محمد خالد علي المسكرية", email: "rahma.almaskari@moe.om", phone: "95773320", title: "أخصائي تقويم مادة اللغة الإنجليزية ثان", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "اللغة الإنجليزية" },
+            { id: "1686518", name: "زيانه راشد محمد راشد البوسعيدية", email: "zayana.albusaidy@moe.om", phone: "99232884", title: "أخصائي تقويم مادة التاريخ أول", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "تاريخ وجغرافيا" },
+            { id: "1686654", name: "اسماء حمود ناصر حمود السناوية", email: "asma.alsinawy@moe.om", phone: "99888657", title: "أخصائي تقويم مادة اللغة العربية أول", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "اللغة العربية" },
+            { id: "16142588", name: "راشد بن محمد بن سالم الحارثي", email: "rashed760@moe.om", phone: "99887346", title: "أخصائي تقويم مادة جغرافيا ثاني", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "جغرافيا" },
+            { id: "16143513", name: "نسرين بنت حمد سيف الرواحية", email: "ns.alrawahi@moe.om", phone: "92559690", title: "اخصائي تقويم مجال أول/2", grade: "التاسعة", degree: "الماجستير وما يعادلهما", specialty: "الجغرافيا" },
+            { id: "16175869", name: "وردة بنت مبروك سويدان الحجرية", email: "warda869@moe.om", phone: "99222087", title: "اخصائي تقويم فنون تشكيلية/4", grade: "العاشرة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "فنون تشكيلية" },
+            { id: "1686397", name: "محمد بن سالم بن محمد اليزيدي", email: "mohammed.alyazeedi1@moe.om", phone: "96010399", title: "أخصائي تقويم مادة التربية الإسلامية أول", grade: "السادسة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "التربية الإسلامية" },
+            { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", email: "salem.94487@moe.om", phone: "95826622", title: "أخصائي تقويم مادة التربية الإسلامية", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "التربية الإسلامية" }
         ];
 
-        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || defaultStaff;
-        let visitsList = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
+        // بيانات قسم العلوم التطبيقية المأخوذة من الملف المرفق
+        const appliedEmployees = [
+            { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", email: "ibrahim.alshabibi@moe.om", phone: "99237027", title: "رئيس قسم", grade: "السابعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" },
+            { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", email: "almughari.fs@moe.om", phone: "98002099", title: "أخصائي تقويم مادة الفيزياء أول", grade: "التاسعة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "فيزياء" },
+            { id: "16119223", name: "نصراء بنت مبارك بن سلطان الإسماعيلي", email: "Nasra.alismaely@moe.om", phone: "92291963", title: "أخصائي تقويم مادة تقنية المعلومات أول", grade: "-", degree: "-", specialty: "تقنية معلومات" },
+            { id: "16128341", name: "وليد بن مالك بن محمد الجهضمي", email: "waleed.algahdami@moe.om", phone: "99533949", title: "أخصائي تقويم مادة الأحياء أول", grade: "الثامنة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "الأحياء" },
+            { id: "16177726", name: "أفراح بنت مبارك بن ناجم الحجرية", email: "afrah-m726@moe.om", phone: "96153689", title: "اخصائي تقويم مجال ثان", grade: "العاشرة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "مجال ثان" },
+            { id: "1682354", name: "علي بن صابح بن سالم بني عرابه", email: "ali.baniaraba@moe.om", phone: "92385401", title: "أخصائي تقويم مادة الرياضيات أول", grade: "السادسة", degree: "البكالوريوس والليسانس وما يعادلهما", specialty: "رياضيات" }
+        ];
 
+        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }));
+        let visitsList = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
         let mainVisitsChart = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             initData();
-            loadJsonData();
             renderAll();
+            renderDepartmentTables();
             initMainChart();
         });
 
-        // محاولة تحميل ملف data.json تلقائياً إن وجد
-        function loadJsonData() {
-            fetch('data.json')
-                .then(res => {
-                    if (res.ok) return res.json();
-                    throw new Error('No data.json');
-                })
-                .then(data => {
-                    if (Array.isArray(data) && data.length > 0) {
-                        staffList = data.map(item => ({
-                            id: item.id,
-                            name: item.name,
-                            dept: item.specialty || item.dept || item.department
-                        }));
-                        saveData();
-                        renderAll();
-                    }
-                })
-                .catch(err => console.log('يعمل التطبيق بالبيانات الافتراضية المسجلة.'));
+        function toggleDepartment(deptKey) {
+            const humSection = document.getElementById('dept-humanities-section');
+            const appSection = document.getElementById('dept-applied-section');
+            const btnHum = document.getElementById('btn-humanities');
+            const btnApp = document.getElementById('btn-applied');
+
+            if (deptKey === 'humanities') {
+                humSection.style.display = 'block';
+                appSection.style.display = 'none';
+                btnHum.classList.add('active');
+                btnApp.classList.remove('active');
+            } else {
+                humSection.style.display = 'none';
+                appSection.style.display = 'block';
+                btnApp.classList.add('active');
+                btnHum.classList.remove('active');
+            }
+        }
+
+        function renderDepartmentTables() {
+            // جدول العلوم الإنسانية
+            const humTbody = document.getElementById('humanities-table-body');
+            humTbody.innerHTML = humanitiesEmployees.map(e => `
+                <tr>
+                    <td><b>${e.id}</b></td>
+                    <td>${e.name}</td>
+                    <td>${e.title}</td>
+                    <td>${e.specialty}</td>
+                    <td><a href="mailto:${e.email}">${e.email}</a></td>
+                    <td>${e.phone}</td>
+                    <td>${e.grade}</td>
+                    <td>${e.degree}</td>
+                </tr>
+            `).join('');
+
+            // جدول العلوم التطبيقية
+            const appTbody = document.getElementById('applied-table-body');
+            appTbody.innerHTML = appliedEmployees.map(e => `
+                <tr>
+                    <td><b>${e.id}</b></td>
+                    <td>${e.name}</td>
+                    <td>${e.title}</td>
+                    <td>${e.specialty}</td>
+                    <td><a href="mailto:${e.email}">${e.email}</a></td>
+                    <td>${e.phone}</td>
+                    <td>${e.grade}</td>
+                    <td>${e.degree}</td>
+                </tr>
+            `).join('');
         }
 
         function saveData() {
@@ -753,7 +879,7 @@
             if (confirm('هل أنت تأكد من رغبتك في إعادة ضبط البيانات إلى القائمة الافتراضية؟')) {
                 localStorage.removeItem('mojaz_staff');
                 localStorage.removeItem('mojaz_visits');
-                staffList = [...defaultStaff];
+                staffList = humanitiesEmployees.map(s => ({ id: s.id, name: s.name, dept: s.specialty }));
                 visitsList = [];
                 saveData();
                 renderAll();
