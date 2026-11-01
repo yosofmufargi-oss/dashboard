@@ -52,7 +52,6 @@
             margin: 0 auto;
         }
 
-        /* شاشة تسجيل الدخول */
         #login-screen {
             display: flex;
             justify-content: center;
@@ -351,7 +350,6 @@
 
 <div class="container">
 
-    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <div class="login-icon">🎓</div>
@@ -373,7 +371,6 @@
         </div>
     </div>
 
-    <!-- لوحة التحكم -->
     <div id="dashboard-app" style="display: none;">
         <header>
             <div class="brand">
@@ -411,7 +408,6 @@
             </div>
         </header>
 
-        <!-- التبويب 1 -->
         <div id="tab-main" class="tab-content active">
             <div class="grid-stats">
                 <div class="stat-card">
@@ -456,7 +452,6 @@
             </div>
         </div>
 
-        <!-- التبويب 2 -->
         <div id="tab-visits" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
@@ -514,7 +509,6 @@
             </div>
         </div>
 
-        <!-- التبويب 3 -->
         <div id="tab-staff" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
@@ -578,16 +572,16 @@
         { specialist: 'علي بن عبدالله الهنائي', school: 'مدرسة المعرفة', teacher: 'خالد الريامي', date: '2026-10-28', status: 'مكتملة', notes: 'تم تجهيز المختبر بنجاح' }
     ];
 
-    let specialists = JSON.parse(localStorage.getItem('mogaz_specs_v3'));
+    let specialists = JSON.parse(localStorage.getItem('mogaz_specs_v4'));
     if (!specialists || specialists.length === 0) {
         specialists = defaultSpecialists;
-        localStorage.setItem('mogaz_specs_v3', JSON.stringify(specialists));
+        localStorage.setItem('mogaz_specs_v4', JSON.stringify(specialists));
     }
 
-    let visits = JSON.parse(localStorage.getItem('mogaz_visits_v3'));
+    let visits = JSON.parse(localStorage.getItem('mogaz_visits_v4'));
     if (!visits || visits.length === 0) {
         visits = defaultVisits;
-        localStorage.setItem('mogaz_visits_v3', JSON.stringify(visits));
+        localStorage.setItem('mogaz_visits_v4', JSON.stringify(visits));
     }
 
     let barChart, doughnutChart;
@@ -628,8 +622,8 @@
         if (confirm("هل تريد إعادة ضبط بيانات الأخصائيين والزيارات للوضع المبدئي؟")) {
             specialists = defaultSpecialists;
             visits = defaultVisits;
-            localStorage.setItem('mogaz_specs_v3', JSON.stringify(specialists));
-            localStorage.setItem('mogaz_visits_v3', JSON.stringify(visits));
+            localStorage.setItem('mogaz_specs_v4', JSON.stringify(specialists));
+            localStorage.setItem('mogaz_visits_v4', JSON.stringify(visits));
             updateUI();
             alert("تم إرجاع البيانات بنجاح!");
         }
@@ -691,7 +685,7 @@
             notes: document.getElementById('visitNotes').value
         };
         visits.push(newVisit);
-        localStorage.setItem('mogaz_visits_v3', JSON.stringify(visits));
+        localStorage.setItem('mogaz_visits_v4', JSON.stringify(visits));
         document.getElementById('visitForm').reset();
         updateUI();
         switchTab('main');
@@ -706,7 +700,7 @@
             spec: document.getElementById('staffSpec').value
         };
         specialists.push(newStaff);
-        localStorage.setItem('mogaz_specs_v3', JSON.stringify(specialists));
+        localStorage.setItem('mogaz_specs_v4', JSON.stringify(specialists));
         document.getElementById('staffForm').reset();
         updateUI();
     }
