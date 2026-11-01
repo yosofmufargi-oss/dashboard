@@ -565,27 +565,31 @@
 </div>
 
 <script>
+    // قائمة الموظفين المبدئية الموسعة
     const defaultSpecialists = [
         { id: '101', name: 'أحمد بن سعيد المفرجي', dept: 'العلوم التطبيقية', spec: 'تقويم رياضيات' },
-        { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' }
+        { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' },
+        { id: '103', name: 'علي بن عبدالله الهنائي', dept: 'العلوم التطبيقية', spec: 'تقويم فيزياء' },
+        { id: '104', name: 'مريم بنت سالم العبرية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة عربية' }
     ];
 
     const defaultVisits = [
         { specialist: 'أحمد بن سعيد المفرجي', school: 'مدرسة الأمل', teacher: 'محمد المعولي', date: '2026-10-25', status: 'تتطلب متابعة', notes: 'يحتاج لمتابعة خطة العلاج' },
-        { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
+        { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' },
+        { specialist: 'علي بن عبدالله الهنائي', school: 'مدرسة المعرفة', teacher: 'خالد الريامي', date: '2026-10-28', status: 'مكتملة', notes: 'تم تجهيز المختبر بنجاح' }
     ];
 
-    // إعادة الضبط التلقائي لضمان ظهور البيانات دون بقاء القوائم الفارغة القديمة
-    let specialists = JSON.parse(localStorage.getItem('specialists'));
+    // تغيير مفاتيح الحفظ لفرض جلب البيانات المحدّثة للجميع
+    let specialists = JSON.parse(localStorage.getItem('mogaz_specs_v2'));
     if (!specialists || specialists.length === 0) {
         specialists = defaultSpecialists;
-        localStorage.setItem('specialists', JSON.stringify(specialists));
+        localStorage.setItem('mogaz_specs_v2', JSON.stringify(specialists));
     }
 
-    let visits = JSON.parse(localStorage.getItem('visits'));
+    let visits = JSON.parse(localStorage.getItem('mogaz_visits_v2'));
     if (!visits || visits.length === 0) {
         visits = defaultVisits;
-        localStorage.setItem('visits', JSON.stringify(visits));
+        localStorage.setItem('mogaz_visits_v2', JSON.stringify(visits));
     }
 
     let barChart, doughnutChart;
@@ -626,8 +630,8 @@
         if (confirm("هل تريد إعادة ضبط بيانات الأخصائيين والزيارات للوضع المبدئي؟")) {
             specialists = defaultSpecialists;
             visits = defaultVisits;
-            localStorage.setItem('specialists', JSON.stringify(specialists));
-            localStorage.setItem('visits', JSON.stringify(visits));
+            localStorage.setItem('mogaz_specs_v2', JSON.stringify(specialists));
+            localStorage.setItem('mogaz_visits_v2', JSON.stringify(visits));
             updateUI();
             alert("تم إرجاع البيانات بنجاح!");
         }
@@ -689,7 +693,7 @@
             notes: document.getElementById('visitNotes').value
         };
         visits.push(newVisit);
-        localStorage.setItem('visits', JSON.stringify(visits));
+        localStorage.setItem('mogaz_visits_v2', JSON.stringify(visits));
         document.getElementById('visitForm').reset();
         updateUI();
         switchTab('main');
@@ -704,7 +708,7 @@
             spec: document.getElementById('staffSpec').value
         };
         specialists.push(newStaff);
-        localStorage.setItem('specialists', JSON.stringify(specialists));
+        localStorage.setItem('mogaz_specs_v2', JSON.stringify(specialists));
         document.getElementById('staffForm').reset();
         updateUI();
     }
