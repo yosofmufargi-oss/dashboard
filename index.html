@@ -1,881 +1,675 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موجز - لوحة تحكم أخصائي تقويم المواد</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        },
-                        emerald: {
-                            500: '#10b981',
-                            600: '#059669',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Tajawal', 'sans-serif'],
-                    }
-                }
+    <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
+    <!-- مكتبات خارجية: Chart.js للرسوم البيانية و SheetJS لتصدير الإكسل -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #2563eb;
+            --shadow-color: rgba(15, 23, 42, 0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --primary: #3b82f6;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* الهيدر العلوي */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: #2563eb;
+            color: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        /* الأزرار ثلاثية الأبعاد (3D Buttons) */
+        .nav-tabs-3d {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-3d {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        .btn-3d:active {
+            transform: translateY(4px) !important;
+            box-shadow: none !important;
+        }
+
+        /* الزر 1: الرئيسية والمؤشرات (أزرق ثلاثي الأبعاد) */
+        .btn-tab-1 {
+            background-color: #2563eb;
+            box-shadow: 0 5px 0 #1d4ed8, 0 8px 15px rgba(37, 99, 235, 0.3);
+        }
+        .btn-tab-1:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        /* الزر 2: سجل الزيارات الميدانية (أخضر ثلاثي الأبعاد) */
+        .btn-tab-2 {
+            background-color: #10b981;
+            box-shadow: 0 5px 0 #047857, 0 8px 15px rgba(16, 185, 129, 0.3);
+        }
+        .btn-tab-2:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+
+        /* الزر 3: إدارة الأخصائيين والموظفين (برتقالي ثلاثي الأبعاد) */
+        .btn-tab-3 {
+            background-color: #f59e0b;
+            box-shadow: 0 5px 0 #b45309, 0 8px 15px rgba(245, 158, 11, 0.3);
+        }
+        .btn-tab-3:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+
+        .badge-num {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-action {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:hover {
+            background: var(--border-color);
+        }
+
+        /* البطاقات والأقسام */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card h3 {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
         }
-    </script>
-    <!-- Google Font - Tajawal -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (XLSX Export) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+
+        .card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 24px;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
+
+        /* النماذج والجداول */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(100, 116, 139, 0.3);
-            border-radius: 3px;
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .dark ::-webkit-scrollbar-thumb {
-            background: rgba(148, 163, 184, 0.2);
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
         }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--bg-color);
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #059669;
+        }
+
         @media print {
-            .no-print {
+            header, .nav-tabs-3d, .header-actions, .btn-submit, form {
                 display: none !important;
             }
-            .print-only {
-                display: block !important;
-            }
             body {
-                background: white !important;
-                color: black !important;
+                background: #fff;
+                color: #000;
             }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+<body>
 
-    <!-- Top Navigation Bar -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Brand / Logo -->
-                <div class="flex items-center space-x-3 space-x-reverse">
-                    <div class="bg-primary-600 text-white p-2.5 rounded-xl shadow-md">
-                        <i class="fa-solid font-bold text-xl fa-clipboard-check"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                            موجز <span class="text-xs bg-primary-100 text-primary-800 dark:bg-primary-900/60 dark:text-primary-300 px-2 py-0.5 rounded-full font-medium">إصدار 2.5</span>
-                        </h1>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">لوحة أخصائي تقويم المواد الميدانية</p>
-                    </div>
-                </div>
-
-                <!-- Global Quick Stats & Controls -->
-                <div class="flex items-center space-x-3 space-x-reverse">
-                    <!-- Urgent Alert Badge -->
-                    <button id="alert-badge" onclick="filterByUrgent()" class="hidden relative inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg text-amber-800 bg-amber-100 dark:bg-amber-900/40 dark:text-amber-300 hover:bg-amber-200 transition-colors">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-600 dark:text-amber-400 ml-1.5 animate-pulse"></i>
-                        <span>زيارات عاجلة: <strong id="urgent-count">0</strong></span>
-                    </button>
-
-                    <!-- Dark Mode Toggle Button -->
-                    <button id="theme-toggle" onclick="toggleDarkMode()" class="p-2.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors focus:outline-none" title="تبديل المظهر">
-                        <i id="theme-toggle-dark-icon" class="fa-solid fa-moon text-lg hidden"></i>
-                        <i id="theme-toggle-light-icon" class="fa-solid fa-sun text-lg text-amber-400"></i>
-                    </button>
-
-                    <!-- Export Excel Button -->
-                    <button onclick="exportToExcel()" class="hidden md:inline-flex items-center px-3.5 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors">
-                        <i class="fa-solid fa-file-excel text-emerald-600 ml-1.5 text-sm"></i>
-                        تصدير Excel
-                    </button>
-
-                    <!-- Print Button -->
-                    <button onclick="window.print()" class="hidden md:inline-flex items-center px-3.5 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200 rounded-xl transition-colors">
-                        <i class="fa-solid fa-print ml-1.5"></i>
-                        طباعة
-                    </button>
-                </div>
+<div class="container">
+    <!-- الهيدر الشامل مع الأزرار الملونة ثلاثية الأبعاد -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">🎓</div>
+            <div>
+                <h2>موجز <span style="font-size: 12px; background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px;">إصدار 2.5</span></h2>
+                <p style="color: var(--text-muted); font-size: 13px;">لوحة أخصائي تقويم المواد الميدانية</p>
             </div>
+        </div>
+
+        <!-- الأزرار الملونة ثلاثية الأبعاد (1، 2، 3) -->
+        <div class="nav-tabs-3d">
+            <button class="btn-3d btn-tab-1" onclick="switchTab('main')">
+                <span class="badge-num">1</span>
+                <span>📊 الرئيسية والمؤشرات</span>
+            </button>
+            
+            <button class="btn-3d btn-tab-2" onclick="switchTab('visits')">
+                <span class="badge-num">2</span>
+                <span>📝 سجل الزيارات الميدانية</span>
+            </button>
+            
+            <button class="btn-3d btn-tab-3" onclick="switchTab('staff')">
+                <span class="badge-num">3</span>
+                <span>👥 إدارة الأخصائيين والموظفين</span>
+            </button>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-action" onclick="toggleTheme()" title="تبديل الوضع">🌙 / ☀️</button>
+            <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
+            <button class="btn-action" onclick="window.print()">🖨️ طباعة</button>
         </div>
     </header>
 
-    <!-- Main Navigation Tabs -->
-    <div class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-xs no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <nav class="flex space-x-6 space-x-reverse overflow-x-auto py-2" aria-label="Tabs">
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active px-4 py-2.5 font-medium text-sm rounded-lg flex items-center gap-2 text-primary-600 bg-primary-50 dark:bg-primary-900/30 dark:text-primary-400 transition-all">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    الرئيسية والمؤشرات
-                </button>
-                <button onclick="switchTab('visits')" id="tab-visits" class="tab-btn px-4 py-2.5 font-medium text-sm rounded-lg flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
-                    <i class="fa-solid fa-route"></i>
-                    سجل الزيارات الميدانية
-                </button>
-                <button onclick="switchTab('staff')" id="tab-staff" class="tab-btn px-4 py-2.5 font-medium text-sm rounded-lg flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all">
-                    <i class="fa-solid fa-users-gear"></i>
-                    إدارة الأخصائيين والموظفين
-                </button>
-            </nav>
+    <!-- التبويب 1: الرئيسية والمؤشرات -->
+    <div id="tab-main" class="tab-content active">
+        <div class="grid-stats">
+            <div class="stat-card">
+                <div>
+                    <h3 id="stat-total-visits">0</h3>
+                    <p>إجمالي الزيارات المسجلة</p>
+                </div>
+                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">📋</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="stat-pending-visits">0</h3>
+                    <p>تتطلب متابعة عاجلة</p>
+                </div>
+                <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⚠️</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="stat-completed-visits">0</h3>
+                    <p>زيارات مكتملة ومستقرة</p>
+                </div>
+                <div class="stat-icon" style="background: #d1fae5; color: #059669;">✅</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="stat-specialists">0</h3>
+                    <p>إجمالي الأخصائيين المسجلين</p>
+                </div>
+                <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">👥</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3>📊 توزيع الزيارات الميدانية حسب القسم والفرع</h3>
+                </div>
+                <canvas id="barChart" height="200"></canvas>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>حالة الزيارات والمتابعة</h3>
+                </div>
+                <canvas id="doughnutChart" height="200"></canvas>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- ==================== TAB 1: DASHBOARD ==================== -->
-        <section id="sec-dashboard" class="space-y-6">
-            <!-- Summary Stats Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">إجمالي الزيارات المسجلة</p>
-                        <h3 id="stat-total-visits" class="text-2xl font-bold mt-1 text-slate-800 dark:text-white">0</h3>
-                        <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-1">
-                            <i class="fa-solid fa-arrow-up text-[10px]"></i> شمولية كاملة للمحافظة
-                        </span>
+    <!-- التبويب 2: سجل الزيارات الميدانية -->
+    <div id="tab-visits" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">📝 تسجيل زيارة ميدانية جديدة</h3>
+            <form id="visitForm" onsubmit="addVisit(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الأخصائي الزائر</label>
+                        <select id="visitSpecialist" required></select>
                     </div>
-                    <div class="w-12 h-12 bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-clipboard-list"></i>
+                    <div class="form-group">
+                        <label>المدرسة / الجهة</label>
+                        <input type="text" id="visitSchool" required placeholder="اسم المدرسة">
                     </div>
-                </div>
-
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">زيارات مكتملة</p>
-                        <h3 id="stat-completed-visits" class="text-2xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">0</h3>
-                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 inline-block">لا تتطلب إجراءات إضافية</span>
+                    <div class="form-group">
+                        <label>المعلم / الموظف المعني</label>
+                        <input type="text" id="visitTeacher" required placeholder="اسم المعلم">
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-circle-check"></i>
+                    <div class="form-group">
+                        <label>تاريخ الزيارة</label>
+                        <input type="date" id="visitDate" required>
                     </div>
-                </div>
-
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">تتطلب متابعة عاجلة</p>
-                        <h3 id="stat-urgent-visits" class="text-2xl font-bold mt-1 text-amber-600 dark:text-amber-400">0</h3>
-                        <span class="text-[11px] text-amber-600 dark:text-amber-400 font-medium mt-1 inline-block">تحتاج زيارة أو تقرير ملحق</span>
-                    </div>
-                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-bell"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">إجمالي الأخصائيين الميدانيين</p>
-                        <h3 id="stat-total-staff" class="text-2xl font-bold mt-1 text-slate-800 dark:text-white">0</h3>
-                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 inline-block">موزعين على قسمين رئيسيين</span>
-                    </div>
-                    <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Visits by Department Bar Chart -->
-                <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
-                            <i class="fa-solid fa-chart-column text-primary-600"></i>
-                            توزيع الزيارات الميدانية حسب القسم والفرع
-                        </h4>
-                    </div>
-                    <div class="relative h-64 w-full">
-                        <canvas id="deptChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Followup Status Doughnut Chart -->
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
-                            <i class="fa-solid fa-chart-donut text-emerald-600"></i>
-                            حالة الزيارات والمتابعة
-                        </h4>
-                    </div>
-                    <div class="relative h-64 w-full flex items-center justify-center">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Visits Quick View Table -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                    <h4 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-primary-600"></i>
-                        أحدث الزيارات الميدانية المسجلة
-                    </h4>
-                    <button onclick="switchTab('visits')" class="text-xs text-primary-600 hover:text-primary-700 font-semibold">عرض الكل ←</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-right text-slate-600 dark:text-slate-300">
-                        <thead class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 uppercase">
-                            <tr>
-                                <th class="px-4 py-3">التاريخ</th>
-                                <th class="px-4 py-3">الأخصائي الزائر</th>
-                                <th class="px-4 py-3">المدرسة</th>
-                                <th class="px-4 py-3">المعلم المستهدف</th>
-                                <th class="px-4 py-3">المادة</th>
-                                <th class="px-4 py-3">الحالة</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recent-visits-table" class="divide-y divide-slate-200 dark:divide-slate-700">
-                            <!-- JS Populated -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ==================== TAB 2: VISITS MANAGEMENT ==================== -->
-        <section id="sec-visits" class="space-y-6 hidden">
-            <!-- Header Controls & New Visit Form -->
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-square-plus text-primary-600"></i>
-                    تسجيل زيارة ميدانية جديدة
-                </h3>
-                
-                <form id="visit-form" onsubmit="handleSaveVisit(event)" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">الأخصائي الزائر *</label>
-                        <select id="v-specialist" required class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                            <option value="">اختر الأخصائي...</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">اسم المدرسة *</label>
-                        <input type="text" id="v-school" required placeholder="مثال: مدرسة الأمل للتعليم الأساسي" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">اسم المعلم *</label>
-                        <input type="text" id="v-teacher" required placeholder="اسم المعلم المزار" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">المادة الدراسية *</label>
-                        <input type="text" id="v-subject" required placeholder="مثال: الرياضيات، الفيزياء..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">تاريخ الزيارة *</label>
-                        <input type="date" id="v-date" required class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">تتطلب متابعة عاجلة؟</label>
-                        <select id="v-followup" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                            <option value="false">لا (مكتملة ومستقرة)</option>
-                            <option value="true">نعم (تتطلب زيارة/تقرير متابعة)</option>
-                        </select>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">الملاحظات والتوصيات التقويمية</label>
-                        <input type="text" id="v-notes" placeholder="أدخل الملاحظات العامة للزيارة..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div class="md:col-span-3 lg:col-span-4 flex justify-end gap-2 mt-2">
-                        <button type="reset" class="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">إلغاء</button>
-                        <button type="submit" class="px-5 py-2 text-xs font-semibold rounded-xl bg-primary-600 hover:bg-primary-700 text-white shadow-md transition-colors flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            حفظ الزيارة
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Visits Filter & Search Table -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row gap-3 justify-between items-center">
-                    <div class="relative w-full sm:w-72">
-                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-slate-400 text-xs"></i>
-                        <input type="text" id="visit-search" oninput="renderVisitsTable()" placeholder="بحث باسم المدرسة، المعلم أو المادة..." class="w-full pr-8 pl-3 py-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:outline-none">
-                    </div>
-
-                    <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
-                        <select id="filter-followup" onchange="renderVisitsTable()" class="p-2 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white">
-                            <option value="all">جميع الحالات</option>
-                            <option value="urgent">تتطلب متابعة فقط</option>
-                            <option value="completed">مكتملة فقط</option>
+                    <div class="form-group">
+                        <label>حالة الزيارة</label>
+                        <select id="visitStatus">
+                            <option value="مكتملة">مكتملة ومستقرة</option>
+                            <option value="تتطلب متابعة">تتطلب متابعة عاجلة</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-right text-slate-600 dark:text-slate-300">
-                        <thead class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 uppercase">
-                            <tr>
-                                <th class="px-4 py-3">تاريخ الزيارة</th>
-                                <th class="px-4 py-3">الأخصائي الزائر</th>
-                                <th class="px-4 py-3">المدرسة</th>
-                                <th class="px-4 py-3">المعلم</th>
-                                <th class="px-4 py-3">المادة</th>
-                                <th class="px-4 py-3">الملاحظات والتوصيات</th>
-                                <th class="px-4 py-3">حالة المتابعة</th>
-                                <th class="px-4 py-3 text-center no-print">إجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="visits-full-table" class="divide-y divide-slate-200 dark:divide-slate-700">
-                            <!-- JS Populated -->
-                        </tbody>
-                    </table>
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>الملاحظات والتوصيات الميدانية</label>
+                    <textarea id="visitNotes" rows="3" placeholder="أدخل الملاحظات..."></textarea>
                 </div>
-            </div>
-        </section>
+                <button type="submit" class="btn-3d btn-tab-2">💾 حفظ الزيارة الميدانية</button>
+            </form>
+        </div>
 
-
-        <!-- ==================== TAB 3: STAFF MANAGEMENT ==================== -->
-        <section id="sec-staff" class="space-y-6 hidden">
-            <!-- Add Specialist Form Card -->
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-primary-600"></i>
-                    إضافة أخصائي تقويم جديد
-                </h3>
-
-                <form id="staff-form" onsubmit="handleSaveStaff(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">الاسم الكامل *</label>
-                        <input type="text" id="s-name" required placeholder="اسم الأخصائي" class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">القسم التابع له *</label>
-                        <select id="s-dept" required class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                            <option value="">اختر القسم...</option>
-                            <option value="قسم تقويم العلوم الإنسانية والمهارات الفردية">قسم تقويم العلوم الإنسانية والمهارات الفردية</option>
-                            <option value="قسم تقويم العلوم التطبيقية">قسم تقويم العلوم التطبيقية</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">المادة/التخصص *</label>
-                        <input type="text" id="s-specialty" required placeholder="مثال: اللغات، الدراسات، العلوم..." class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold mb-1 text-slate-600 dark:text-slate-300">رقم التواصل / الهاتف</label>
-                        <input type="tel" id="s-phone" placeholder="968xxxx----+ " class="w-full p-2.5 text-xs rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none">
-                    </div>
-
-                    <div class="md:col-span-2 flex justify-end items-end gap-2">
-                        <button type="reset" class="px-4 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">إلغاء</button>
-                        <button type="submit" class="px-5 py-2.5 text-xs font-semibold rounded-xl bg-primary-600 hover:bg-primary-700 text-white shadow-md transition-colors flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-check"></i>
-                            اعتماد وتخزين الأخصائي
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Staff List Grid -->
-            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-5">
-                <div class="flex justify-between items-center mb-4">
-                    <h4 class="font-bold text-slate-800 dark:text-white text-base flex items-center gap-2">
-                        <i class="fa-solid fa-users text-primary-600"></i>
-                        سجل الأخصائيين المسجلين بالمحافظة
-                    </h4>
-                </div>
-
-                <div id="staff-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- JS Populated -->
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Global Notification Banner / Toast Container -->
-    <div id="toast-container" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 no-print"></div>
-
-    <!-- Footer -->
-    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-4 mt-auto text-center text-xs text-slate-500 dark:text-slate-400 no-print">
-        <p>© 2026 برنامج موجز - نظام إدارة أخصائي تقويم المواد الميداني. جميع الحقوق محفوظة.</p>
-    </footer>
-
-    <!-- Javascript Logic -->
-    <script>
-        // --- DATA STORE (Using localStorage with pre-filled mock data if empty) ---
-        const DEFAULT_STAFF = [
-            { id: 1, name: "أحمد بن سالم المعمري", dept: "قسم تقويم العلوم الإنسانية والمهارات الفردية", specialty: "اللغة العربية", phone: "+968 95000001" },
-            { id: 2, name: "فاطمة بنت علي البلوشية", dept: "قسم تقويم العلوم التطبيقية", specialty: "الرياضيات", phone: "+968 95000002" },
-            { id: 3, name: "سعيد بن محمد الحارثي", dept: "قسم تقويم العلوم التطبيقية", specialty: "الفيزياء والتقانة", phone: "+968 95000003" },
-            { id: 4, name: "مريم بنت خالد الزدجالية", dept: "قسم تقويم العلوم الإنسانية والمهارات الفردية", specialty: "الدراسات الاجتماعية", phone: "+968 95000004" }
-        ];
-
-        const DEFAULT_VISITS = [
-            { id: 101, specialistId: 1, specialistName: "أحمد بن سالم المعمري", school: "مدرسة السلطان قابوس", teacher: "محمد الهنائي", subject: "اللغة العربية", date: "2026-10-25", followup: true, notes: "يحتاج المعلم لمتابعة استراتيجيات التقييم التكويني في الفصل." },
-            { id: 102, specialistId: 2, specialistName: "فاطمة بنت علي البلوشية", school: "مدرسة المعرفة للتعليم الأساسي", teacher: "عائشة الكندية", subject: "الرياضيات", date: "2026-10-28", followup: false, notes: "أداء ممتاز وتفعيل رائع للأدوات الرقمية." },
-            { id: 103, specialistId: 3, specialistName: "سعيد بن محمد الحارثي", school: "مدرسة النهضة", teacher: "خالد الشحي", subject: "الفيزياء", date: "2026-11-01", followup: true, notes: "متابعة تجهيزات المختبر وصيانة الأجهزة مع المعلم." }
-        ];
-
-        let staffList = JSON.parse(localStorage.getItem('mojaz_staff')) || DEFAULT_STAFF;
-        let visitsList = JSON.parse(localStorage.getItem('mojaz_visits')) || DEFAULT_VISITS;
-
-        let deptChartInstance = null;
-        let statusChartInstance = null;
-
-        // --- APP INITIALIZATION ---
-        window.onload = function() {
-            initTheme();
-            renderStaffSelectOptions();
-            renderDashboard();
-            renderVisitsTable();
-            renderStaffGrid();
-            
-            // Set default date to today
-            document.getElementById('v-date').value = new Date().toISOString().split('T')[0];
-        };
-
-        // --- THEME / DARK MODE TOGGLE ---
-        function initTheme() {
-            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-                document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
-                document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.getElementById('theme-toggle-light-icon').classList.add('hidden');
-                document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
-            }
-        }
-
-        function toggleDarkMode() {
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
-                darkIcon.classList.remove('hidden');
-                lightIcon.classList.add('hidden');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
-                lightIcon.classList.remove('hidden');
-                darkIcon.classList.add('hidden');
-            }
-            renderCharts(); // Redraw chart colors
-        }
-
-        // --- NAVIGATION TABS ---
-        function switchTab(tabName) {
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'text-primary-600', 'bg-primary-50', 'dark:bg-primary-900/30', 'dark:text-primary-400');
-                btn.classList.add('text-slate-600', 'dark:text-slate-300');
-            });
-
-            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`tab-${tabName}`);
-            activeBtn.classList.add('active', 'text-primary-600', 'bg-primary-50', 'dark:bg-primary-900/30', 'dark:text-primary-400');
-
-            if (tabName === 'dashboard') {
-                renderDashboard();
-            }
-        }
-
-        // --- RENDER DASHBOARD & CHARTS ---
-        function renderDashboard() {
-            // Stats
-            const totalVisits = visitsList.length;
-            const urgentVisits = visitsList.filter(v => v.followup === true).length;
-            const completedVisits = totalVisits - urgentVisits;
-            const totalStaff = staffList.length;
-
-            document.getElementById('stat-total-visits').textContent = totalVisits;
-            document.getElementById('stat-completed-visits').textContent = completedVisits;
-            document.getElementById('stat-urgent-visits').textContent = urgentVisits;
-            document.getElementById('stat-total-staff').textContent = totalStaff;
-
-            // Urgent alert badge on header
-            const alertBadge = document.getElementById('alert-badge');
-            if (urgentVisits > 0) {
-                alertBadge.classList.remove('hidden');
-                document.getElementById('urgent-count').textContent = urgentVisits;
-            } else {
-                alertBadge.classList.add('hidden');
-            }
-
-            // Recent visits
-            const recentTable = document.getElementById('recent-visits-table');
-            recentTable.innerHTML = '';
-            const sortedVisits = [...visitsList].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-
-            if (sortedVisits.length === 0) {
-                recentTable.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-xs text-slate-400">لا توجد زيارات مسجلة حديثاً</td></tr>`;
-            } else {
-                sortedVisits.forEach(v => {
-                    const statusTag = v.followup 
-                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"><i class="fa-solid fa-clock ml-1 text-[10px]"></i> يتطلب متابعة</span>`
-                        : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"><i class="fa-solid fa-check ml-1 text-[10px]"></i> مكتملة</span>`;
-
-                    recentTable.innerHTML += `
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                            <td class="px-4 py-3 font-mono text-xs">${v.date}</td>
-                            <td class="px-4 py-3 font-medium text-slate-800 dark:text-white">${v.specialistName}</td>
-                            <td class="px-4 py-3">${v.school}</td>
-                            <td class="px-4 py-3">${v.teacher}</td>
-                            <td class="px-4 py-3"><span class="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded text-xs">${v.subject}</span></td>
-                            <td class="px-4 py-3">${statusTag}</td>
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">📜 سجل الزيارات المسجلة</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الأخصائي</th>
+                            <th>المدرسة</th>
+                            <th>المعلم</th>
+                            <th>التاريخ</th>
+                            <th>الحالة</th>
+                            <th>الملاحظات</th>
                         </tr>
-                    `;
-                });
-            }
+                    </thead>
+                    <tbody id="visitsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-            renderCharts();
-        }
-
-        function renderCharts() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#cbd5e1' : '#475569';
-
-            // Chart 1: Visits by Department
-            let humVisits = 0;
-            let appVisits = 0;
-
-            visitsList.forEach(v => {
-                const staff = staffList.find(s => s.id == v.specialistId || s.name === v.specialistName);
-                if (staff && staff.dept.includes('الإنسانية')) {
-                    humVisits++;
-                } else if (staff && staff.dept.includes('التطبيقية')) {
-                    appVisits++;
-                }
-            });
-
-            const ctxDept = document.getElementById('deptChart').getContext('2d');
-            if (deptChartInstance) deptChartInstance.destroy();
-
-            deptChartInstance = new Chart(ctxDept, {
-                type: 'bar',
-                data: {
-                    labels: ['العلوم الإنسانية والمهارات الفردية', 'العلوم التطبيقية'],
-                    datasets: [{
-                        label: 'عدد الزيارات الميدانية',
-                        data: [humVisits, appVisits],
-                        backgroundColor: ['#0284c7', '#10b981'],
-                        borderRadius: 8,
-                        barThickness: 36
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: { ticks: { color: textColor, font: { family: 'Tajawal' } } },
-                        y: { ticks: { color: textColor, font: { family: 'Tajawal' } }, beginAtZero: true }
-                    }
-                }
-            });
-
-            // Chart 2: Status Breakdown
-            const urgentVisits = visitsList.filter(v => v.followup === true).length;
-            const completedVisits = visitsList.length - urgentVisits;
-
-            const ctxStatus = document.getElementById('statusChart').getContext('2d');
-            if (statusChartInstance) statusChartInstance.destroy();
-
-            statusChartInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: ['مكتملة ومستقرة', 'تتطلب متابعة عاجلة'],
-                    datasets: [{
-                        data: [completedVisits, urgentVisits],
-                        backgroundColor: ['#10b981', '#f59e0b'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: textColor, font: { family: 'Tajawal' } }
-                        }
-                    }
-                }
-            });
-        }
-
-        // --- STAFF MANAGEMENT ---
-        function renderStaffSelectOptions() {
-            const select = document.getElementById('v-specialist');
-            select.innerHTML = '<option value="">اختر الأخصائي...</option>';
-            staffList.forEach(s => {
-                select.innerHTML += `<option value="${s.id}">${s.name} - ${s.specialty}</option>`;
-            });
-        }
-
-        function renderStaffGrid() {
-            const grid = document.getElementById('staff-grid');
-            grid.innerHTML = '';
-
-            if (staffList.length === 0) {
-                grid.innerHTML = '<p class="text-xs text-slate-400 col-span-3 text-center py-6">لا يوجد أخصائيين مسجلين حالياً.</p>';
-                return;
-            }
-
-            staffList.forEach(s => {
-                const count = visitsList.filter(v => v.specialistId == s.id || v.specialistName === s.name).length;
-                grid.innerHTML += `
-                    <div class="bg-slate-50 dark:bg-slate-700/40 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <h5 class="font-bold text-slate-800 dark:text-white text-sm">${s.name}</h5>
-                                <span class="text-[10px] bg-primary-100 dark:bg-primary-900/60 text-primary-800 dark:text-primary-300 px-2 py-0.5 rounded-full">${s.specialty}</span>
-                            </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1"><i class="fa-solid fa-sitemap ml-1"></i> ${s.dept}</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400"><i class="fa-solid fa-phone ml-1"></i> ${s.phone || 'غير محدد'}</p>
-                        </div>
-                        <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-600 flex justify-between items-center text-xs">
-                            <span class="text-slate-600 dark:text-slate-300 font-semibold">عدد الزيارات: <strong>${count}</strong></span>
-                            <button onclick="deleteStaff(${s.id})" class="text-rose-500 hover:text-rose-700 text-xs flex items-center gap-1">
-                                <i class="fa-solid fa-trash"></i> حذف
-                            </button>
-                        </div>
+    <!-- التبويب 3: إدارة الأخصائيين والموظفين -->
+    <div id="tab-staff" class="tab-content">
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">➕ إضافة أخصائي / موظف جديد</h3>
+            <form id="staffForm" onsubmit="addStaff(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>الرقم الوظيفي</label>
+                        <input type="text" id="staffId" required placeholder="مثال: 1024">
                     </div>
-                `;
-            });
-        }
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="staffName" required placeholder="اسم الموظف">
+                    </div>
+                    <div class="form-group">
+                        <label>القسم</label>
+                        <select id="staffDept">
+                            <option value="العلوم الإنسانية والمهارات الفردية">العلوم الإنسانية والمهارات الفردية</option>
+                            <option value="العلوم التطبيقية">العلوم التطبيقية</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>التخصص</label>
+                        <input type="text" id="staffSpec" placeholder="مثال: رياضيات / لغة عربية">
+                    </div>
+                </div>
+                <button type="submit" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
+            </form>
+        </div>
 
-        function handleSaveStaff(e) {
-            e.preventDefault();
-            const name = document.getElementById('s-name').value.trim();
-            const dept = document.getElementById('s-dept').value;
-            const specialty = document.getElementById('s-specialty').value.trim();
-            const phone = document.getElementById('s-phone').value.trim();
+        <div class="card">
+            <h3 style="margin-bottom: 16px;">👥 قائمة الموظفين والأخصائيين المسجلين</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الرقم الوظيفي</th>
+                            <th>الاسم الكامل</th>
+                            <th>القسم</th>
+                            <th>التخصص</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-            const newStaff = {
-                id: Date.now(),
-                name,
-                dept,
-                specialty,
-                phone
-            };
+<script>
+    // البيانات الأساسية للتطبيق
+    let specialists = JSON.parse(localStorage.getItem('specialists')) || [
+        { id: '101', name: 'أحمد بن سعيد المفرجي', dept: 'العلوم التطبيقية', spec: 'تقويم رياضيات' },
+        { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' }
+    ];
 
-            staffList.push(newStaff);
-            localStorage.setItem('mojaz_staff', JSON.stringify(staffList));
+    let visits = JSON.parse(localStorage.getItem('visits')) || [
+        { specialist: 'أحمد بن سعيد المفرجي', school: 'مدرسة الأمل', teacher: 'محمد المعولي', date: '2026-10-25', status: 'تتطلب متابعة', notes: 'يحتاج لمتابعة خطة العلاج' },
+        { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
+    ];
 
-            document.getElementById('staff-form').reset();
-            renderStaffSelectOptions();
-            renderStaffGrid();
-            renderDashboard();
-            showToast('تمت إضافة الأخصائي بنجاح', 'success');
-        }
+    let barChart, doughnutChart;
 
-        function deleteStaff(id) {
-            if (confirm('هل أنت تأكد من حذف هذا الأخصائي؟')) {
-                staffList = staffList.filter(s => s.id !== id);
-                localStorage.setItem('mojaz_staff', JSON.stringify(staffList));
-                renderStaffSelectOptions();
-                renderStaffGrid();
-                renderDashboard();
-                showToast('تم حذف الأخصائي', 'info');
-            }
-        }
+    // التنقل بين التبويبات 1 و 2 و 3
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+    }
 
-        // --- VISITS MANAGEMENT ---
-        function renderVisitsTable() {
-            const tbody = document.getElementById('visits-full-table');
-            const search = document.getElementById('visit-search').value.toLowerCase();
-            const filterFollowup = document.getElementById('filter-followup').value;
+    // تبديل الوضع الداكن/الفاتح
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nextTheme);
+    }
 
-            tbody.innerHTML = '';
+    // تحديث الواجهة والبيانات
+    function updateUI() {
+        // تحديث الإحصائيات
+        document.getElementById('stat-total-visits').textContent = visits.length;
+        document.getElementById('stat-pending-visits').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
+        document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
+        document.getElementById('stat-specialists').textContent = specialists.length;
 
-            let filtered = visitsList.filter(v => {
-                const matchesSearch = v.school.toLowerCase().includes(search) || 
-                                      v.teacher.toLowerCase().includes(search) || 
-                                      v.subject.toLowerCase().includes(search) || 
-                                      v.specialistName.toLowerCase().includes(search);
+        // تحديث قائمة الاختيار
+        const select = document.getElementById('visitSpecialist');
+        select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.dept})</option>`).join('');
 
-                if (filterFollowup === 'urgent') return matchesSearch && v.followup === true;
-                if (filterFollowup === 'completed') return matchesSearch && v.followup === false;
-                return matchesSearch;
-            });
+        // تحديث جداول البيانات
+        document.getElementById('visitsTableBody').innerHTML = visits.map(v => `
+            <tr>
+                <td><strong>${v.specialist}</strong></td>
+                <td>${v.school}</td>
+                <td>${v.teacher}</td>
+                <td>${v.date}</td>
+                <td><span class="status-badge ${v.status === 'تتطلب متابعة' ? 'status-warning' : 'status-success'}">${v.status}</span></td>
+                <td>${v.notes || '-'}</td>
+            </tr>
+        `).join('');
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-xs text-slate-400">لا توجد نتائج مطابقة للبحث</td></tr>`;
-                return;
-            }
+        document.getElementById('staffTableBody').innerHTML = specialists.map(s => `
+            <tr>
+                <td>${s.id}</td>
+                <td><strong>${s.name}</strong></td>
+                <td>${s.dept}</td>
+                <td>${s.spec}</td>
+            </tr>
+        `).join('');
 
-            filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(v => {
-                const statusBadge = v.followup 
-                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300"><i class="fa-solid fa-triangle-exclamation ml-1 text-[10px]"></i> تتطلب متابعة</span>`
-                    : `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"><i class="fa-solid fa-check ml-1 text-[10px]"></i> مكتملة</span>`;
+        renderCharts();
+    }
 
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                        <td class="px-4 py-3 font-mono text-xs whitespace-nowrap">${v.date}</td>
-                        <td class="px-4 py-3 font-medium text-slate-800 dark:text-white">${v.specialistName}</td>
-                        <td class="px-4 py-3 font-medium">${v.school}</td>
-                        <td class="px-4 py-3">${v.teacher}</td>
-                        <td class="px-4 py-3"><span class="bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded text-xs">${v.subject}</span></td>
-                        <td class="px-4 py-3 text-xs max-w-xs truncate" title="${v.notes}">${v.notes || '-'}</td>
-                        <td class="px-4 py-3 whitespace-nowrap">${statusBadge}</td>
-                        <td class="px-4 py-3 text-center no-print whitespace-nowrap">
-                            <button onclick="toggleVisitStatus(${v.id})" class="text-slate-500 hover:text-primary-600 px-2 py-1" title="تغيير حالة المتابعة">
-                                <i class="fa-solid fa-rotate"></i>
-                            </button>
-                            <button onclick="deleteVisit(${v.id})" class="text-rose-500 hover:text-rose-700 px-2 py-1" title="حذف الزيارة">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+    // إضافة زيارة جديدة
+    function addVisit(e) {
+        e.preventDefault();
+        const newVisit = {
+            specialist: document.getElementById('visitSpecialist').value,
+            school: document.getElementById('visitSchool').value,
+            teacher: document.getElementById('visitTeacher').value,
+            date: document.getElementById('visitDate').value,
+            status: document.getElementById('visitStatus').value,
+            notes: document.getElementById('visitNotes').value
+        };
+        visits.push(newVisit);
+        localStorage.setItem('visits', JSON.stringify(visits));
+        document.getElementById('visitForm').reset();
+        updateUI();
+        switchTab('main');
+    }
 
-        function handleSaveVisit(e) {
-            e.preventDefault();
-            const specId = document.getElementById('v-specialist').value;
-            const specialist = staffList.find(s => s.id == specId);
+    // إضافة موظف جديد
+    function addStaff(e) {
+        e.preventDefault();
+        const newStaff = {
+            id: document.getElementById('staffId').value,
+            name: document.getElementById('staffName').value,
+            dept: document.getElementById('staffDept').value,
+            spec: document.getElementById('staffSpec').value
+        };
+        specialists.push(newStaff);
+        localStorage.setItem('specialists', JSON.stringify(specialists));
+        document.getElementById('staffForm').reset();
+        updateUI();
+    }
 
-            if (!specialist) {
-                showToast('يرجى اختيار أخصائي معرف مسبقاً', 'error');
-                return;
-            }
+    // تصدير للـ Excel
+    function exportToExcel() {
+        const ws = XLSX.utils.json_to_sheet(visits);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "الزيارات الميدانية");
+        XLSX.writeFile(wb, "تقرير_الزيارات_الميدانية.xlsx");
+    }
 
-            const newVisit = {
-                id: Date.now(),
-                specialistId: specialist.id,
-                specialistName: specialist.name,
-                school: document.getElementById('v-school').value.trim(),
-                teacher: document.getElementById('v-teacher').value.trim(),
-                subject: document.getElementById('v-subject').value.trim(),
-                date: document.getElementById('v-date').value,
-                followup: document.getElementById('v-followup').value === 'true',
-                notes: document.getElementById('v-notes').value.trim()
-            };
+    // رسم البيانات
+    function renderCharts() {
+        if (barChart) barChart.destroy();
+        if (doughnutChart) doughnutChart.destroy();
 
-            visitsList.push(newVisit);
-            localStorage.setItem('mojaz_visits', JSON.stringify(visitsList));
+        const ctx1 = document.getElementById('barChart').getContext('2d');
+        barChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['العلوم التطبيقية', 'العلوم الإنسانية والمهارات الفردية'],
+                datasets: [{
+                    label: 'عدد الزيارات',
+                    data: [
+                        visits.filter(v => specialists.find(s => s.name === v.specialist)?.dept === 'العلوم التطبيقية').length,
+                        visits.filter(v => specialists.find(s => s.name === v.specialist)?.dept === 'العلوم الإنسانية والمهارات الفردية').length
+                    ],
+                    backgroundColor: ['#2563eb', '#f59e0b'],
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
 
-            document.getElementById('visit-form').reset();
-            document.getElementById('v-date').value = new Date().toISOString().split('T')[0];
+        const ctx2 = document.getElementById('doughnutChart').getContext('2d');
+        doughnutChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['مكتملة ومستقرة', 'تتطلب متابعة'],
+                datasets: [{
+                    data: [
+                        visits.filter(v => v.status === 'مكتملة').length,
+                        visits.filter(v => v.status === 'تتطلب متابعة').length
+                    ],
+                    backgroundColor: ['#10b981', '#f59e0b']
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
 
-            renderVisitsTable();
-            renderDashboard();
-            showToast('تم سجل الزيارة الميدانية بنجاح', 'success');
-        }
-
-        function toggleVisitStatus(id) {
-            const visit = visitsList.find(v => v.id === id);
-            if (visit) {
-                visit.followup = !visit.followup;
-                localStorage.setItem('mojaz_visits', JSON.stringify(visitsList));
-                renderVisitsTable();
-                renderDashboard();
-                showToast('تم تحديث حالة المتابعة للزيارة', 'info');
-            }
-        }
-
-        function deleteVisit(id) {
-            if (confirm('هل أنت تأكد من حذف سجل هذه الزيارة؟')) {
-                visitsList = visitsList.filter(v => v.id !== id);
-                localStorage.setItem('mojaz_visits', JSON.stringify(visitsList));
-                renderVisitsTable();
-                renderDashboard();
-                showToast('تم حذف الزيارة بنجاح', 'info');
-            }
-        }
-
-        function filterByUrgent() {
-            switchTab('visits');
-            document.getElementById('filter-followup').value = 'urgent';
-            renderVisitsTable();
-        }
-
-        // --- EXPORT TO EXCEL ---
-        function exportToExcel() {
-            if (visitsList.length === 0) {
-                showToast('لا توجد بيانات متاحة للتصدير', 'error');
-                return;
-            }
-
-            const exportData = visitsList.map(v => ({
-                'تاريخ الزيارة': v.date,
-                'الأخصائي الزائر': v.specialistName,
-                'المدرسة': v.school,
-                'المعلم المستهدف': v.teacher,
-                'المادة الدراسية': v.subject,
-                'حالة المتابعة': v.followup ? 'تتطلب متابعة عاجلة' : 'مكتملة ومستقرة',
-                'الملاحظات': v.notes
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(exportData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "الزيارات الميدانية");
-            XLSX.writeFile(workbook, `سجل_الزيارات_الميدانية_موجز_${new Date().toISOString().split('T')[0]}.xlsx`);
-            
-            showToast('تم تصدير ملف Excel بنجاح', 'success');
-        }
-
-        // --- TOAST NOTIFICATIONS ---
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let bg = 'bg-slate-800 text-white';
-            let icon = 'fa-circle-info';
-
-            if (type === 'success') {
-                bg = 'bg-emerald-600 text-white';
-                icon = 'fa-circle-check';
-            } else if (type === 'error') {
-                bg = 'bg-rose-600 text-white';
-                icon = 'fa-circle-exclamation';
-            }
-
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0`;
-            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    </script>
+    // التشغيل المبدئي
+    document.getElementById('visitDate').valueAsDate = new Date();
+    updateUI();
+</script>
 </body>
 </html>
