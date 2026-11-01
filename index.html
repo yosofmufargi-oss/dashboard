@@ -39,7 +39,7 @@
         .btn-tab-3 { background-color: #f59e0b; box-shadow: 0 5px 0 #b45309; }
         .btn-logout-3d { background-color: #ef4444; box-shadow: 0 5px 0 #b91c1c; }
 
-        .badge-num { background: rgba(255, 255, 255, 0.3); padding: 2px 10px; border-radius: 8px; font-size: 14px; font-weight: 800; }
+        .badge-num { background: rgba(255, 255, 255, 0.3); padding: 2px 10px; border-radius: 8px; font-size: 14px; font-weight: 800; min-width: 24px; text-align: center; }
         .header-actions { display: flex; gap: 10px; align-items: center; }
         .btn-action { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-color); padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 700; }
 
@@ -76,7 +76,6 @@
 <body>
 
 <div class="container">
-    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <div class="login-icon">🎓</div>
@@ -97,21 +96,26 @@
         </div>
     </div>
 
-    <!-- لوحة التحكم -->
     <div id="dashboard-app" style="display: none;">
         <header>
             <div class="brand">
                 <div class="brand-icon">🎓</div>
                 <div>
-                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 3.0</span></h2>
+                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 3.1</span></h2>
                     <p style="color: var(--text-muted); font-size: 13px; font-weight: 600;">لوحة أخصائي تقويم المواد الميدانية</p>
                 </div>
             </div>
 
             <div class="nav-tabs-3d">
-                <button class="btn-3d btn-tab-1" onclick="switchTab('main')"><span class="badge-num">1</span> 📊 الرئيسية والمؤشرات</button>
-                <button class="btn-3d btn-tab-2" onclick="switchTab('visits')"><span class="badge-num">2</span> 📝 سجل الزيارات</button>
-                <button class="btn-3d btn-tab-3" onclick="switchTab('staff')"><span class="badge-num">3</span> 👥 الموظفين والأخصائيين</button>
+                <button class="btn-3d btn-tab-1" onclick="switchTab('main')">
+                    <span class="badge-num" id="badge-tab-1">0</span> 📊 الرئيسية والمؤشرات
+                </button>
+                <button class="btn-3d btn-tab-2" onclick="switchTab('visits')">
+                    <span class="badge-num" id="badge-tab-2">0</span> 📝 سجل الزيارات
+                </button>
+                <button class="btn-3d btn-tab-3" onclick="switchTab('staff')">
+                    <span class="badge-num" id="badge-tab-3">0</span> 👥 الموظفين والأخصائيين
+                </button>
             </div>
 
             <div class="header-actions">
@@ -121,7 +125,6 @@
             </div>
         </header>
 
-        <!-- التبويب 1 -->
         <div id="tab-main" class="tab-content active">
             <div class="grid-stats">
                 <div class="stat-card">
@@ -154,7 +157,6 @@
             </div>
         </div>
 
-        <!-- التبويب 2 -->
         <div id="tab-visits" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
@@ -182,7 +184,6 @@
             </div>
         </div>
 
-        <!-- التبويب 3 -->
         <div id="tab-staff" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
@@ -211,17 +212,13 @@
 </div>
 
 <script>
-    // البيانات الفعلية المعتمدة المستخرجة من المستندات المرفقة
     const officialSpecialists = [
-        // أخصائيو العلوم التطبيقية
         { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "رئيس قسم - رياضيات" },
         { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الفيزياء أول" },
         { id: "16119223", name: "نصراء بنت مبارك بن سلطان الإسماعيلية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة تقنية المعلومات أول" },
         { id: "16128341", name: "وليد بن مالك بن محمد الجهضمي", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الأحياء أول" },
         { id: "16177726", name: "أفراح بنت مبارك بن ناجم الحجرية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مجال ثان" },
         { id: "1682354", name: "علي بن صابح بن سالم بني عرابه", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الرياضيات أول" },
-        
-        // أخصائيو العلوم الإنسانية والمهارات الفردية
         { id: "1696508", name: "يوسف بن سليمان بن سالم المفرجي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "رئيس قسم" },
         { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة الرياضة المدرسية ثان" },
         { id: "16125123", name: "رحمه محمد خالد علي المسكرية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة اللغة الإنجليزية ثان" },
@@ -234,11 +231,9 @@
         { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة التربية الإسلامية" }
     ];
 
-    // جلب البيانات أو تحميل القائمة الرسمية المعتمدة مباشرة
     let specialists = JSON.parse(localStorage.getItem('mogaz_official_specs_v3')) || officialSpecialists;
     let visits = JSON.parse(localStorage.getItem('mogaz_official_visits_v3')) || [];
 
-    // تأكيد التحميل القسري للأسماء المعتمدة إذا كانت الذاكرة القديمة فارغة
     if (!specialists || specialists.length === 0) {
         specialists = officialSpecialists;
         localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
@@ -289,10 +284,16 @@
     }
 
     function updateUI() {
+        // تحديث كروت المؤشرات
         document.getElementById('stat-total-visits').textContent = visits.length;
         document.getElementById('stat-pending-visits').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
         document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
         document.getElementById('stat-specialists').textContent = specialists.length;
+
+        // تحديث العدادات الرقمية داخل أزرار التنقل الإعدادية
+        document.getElementById('badge-tab-1').textContent = visits.length;
+        document.getElementById('badge-tab-2').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
+        document.getElementById('badge-tab-3').textContent = specialists.length;
 
         const select = document.getElementById('visitSpecialist');
         select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.spec})</option>`).join('');
