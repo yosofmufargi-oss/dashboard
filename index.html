@@ -565,7 +565,6 @@
 </div>
 
 <script>
-    // البيانات المبدئية
     const defaultSpecialists = [
         { id: '101', name: 'أحمد بن سعيد المفرجي', dept: 'العلوم التطبيقية', spec: 'تقويم رياضيات' },
         { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' }
@@ -576,12 +575,18 @@
         { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
     ];
 
-    // ضمان التحميل القسري للأسماء إذا كانت الذاكرة المحلية فارغة
-    let savedSpecs = JSON.parse(localStorage.getItem('specialists'));
-    let specialists = (savedSpecs && savedSpecs.length > 0) ? savedSpecs : defaultSpecialists;
+    // إعادة الضبط التلقائي لضمان ظهور البيانات دون بقاء القوائم الفارغة القديمة
+    let specialists = JSON.parse(localStorage.getItem('specialists'));
+    if (!specialists || specialists.length === 0) {
+        specialists = defaultSpecialists;
+        localStorage.setItem('specialists', JSON.stringify(specialists));
+    }
 
-    let savedVisits = JSON.parse(localStorage.getItem('visits'));
-    let visits = (savedVisits && savedVisits.length > 0) ? savedVisits : defaultVisits;
+    let visits = JSON.parse(localStorage.getItem('visits'));
+    if (!visits || visits.length === 0) {
+        visits = defaultVisits;
+        localStorage.setItem('visits', JSON.stringify(visits));
+    }
 
     let barChart, doughnutChart;
 
@@ -640,19 +645,16 @@
     }
 
     function updateUI() {
-        // تحديث كروت الإحصائيات
         document.getElementById('stat-total-visits').textContent = visits.length;
         document.getElementById('stat-pending-visits').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
         document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
         document.getElementById('stat-specialists').textContent = specialists.length;
 
-        // خيارات الأخصائي الزائر
         const select = document.getElementById('visitSpecialist');
         if (select) {
             select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.dept})</option>`).join('');
         }
 
-        // جدول الزيارات
         document.getElementById('visitsTableBody').innerHTML = visits.map(v => `
             <tr>
                 <td><strong>${v.specialist}</strong></td>
@@ -664,7 +666,6 @@
             </tr>
         `).join('');
 
-        // جدول الموظفين الأخصائيين
         document.getElementById('staffTableBody').innerHTML = specialists.map(s => `
             <tr>
                 <td>${s.id}</td>
