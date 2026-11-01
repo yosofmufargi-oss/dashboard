@@ -71,37 +71,43 @@
         .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 800; display: inline-block; }
         .status-warning { background: #fef3c7; color: #b45309; }
         .status-success { background: #d1fae5; color: #047857; }
+
+        .btn-table-action { border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; margin-left: 4px; }
+        .btn-edit { background: #f59e0b; color: white; }
+        .btn-delete { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <div class="login-icon">🎓</div>
             <h2 style="font-weight: 800; margin-bottom: 6px;">موجز - تسجيل الدخول</h2>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">يرجى إدخال اسم المستخدم وكلمة المرور للوصول للوحة</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">اسم المستخدم وكلمة المرور هما الرقم الوظيفي الخاص بك (أو admin)</p>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="loginUser" required>
+                    <label>👤 اسم المستخدم (الرقم الوظيفي)</label>
+                    <input type="text" id="loginUser" placeholder="أدخل الرقم الوظيفي" required>
                 </div>
                 <div class="form-group" style="margin-bottom: 24px;">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="loginPass" required>
+                    <label>🔒 كلمة المرور (الرقم الوظيفي)</label>
+                    <input type="password" id="loginPass" placeholder="أدخل كلمة المرور" required>
                 </div>
-                <div id="loginError" style="color: #ef4444; font-weight: 700; font-size: 14px; margin-bottom: 16px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+                <div id="loginError" style="color: #ef4444; font-weight: 700; font-size: 13px; margin-bottom: 16px; display: none;">عفواً، لا تملك صلاحية الدخول لعدم وجود الرقم الوظيفي!</div>
                 <button type="submit" class="btn-3d btn-tab-1" style="width: 100%; justify-content: center; padding: 12px;">🔑 تسجيل الدخول</button>
             </form>
         </div>
     </div>
 
+    <!-- لوحة التحكم -->
     <div id="dashboard-app" style="display: none;">
         <header>
             <div class="brand">
                 <div class="brand-icon">🎓</div>
                 <div>
-                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 3.1</span></h2>
+                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 3.2</span></h2>
                     <p style="color: var(--text-muted); font-size: 13px; font-weight: 600;">لوحة أخصائي تقويم المواد الميدانية</p>
                 </div>
             </div>
@@ -120,11 +126,12 @@
 
             <div class="header-actions">
                 <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
-                <button class="btn-action" onclick="resetData()" style="color: #d97706;">🔄 استعادة الأخصائيين المعتمدين</button>
+                <button class="btn-action" onclick="resetData()" style="color: #d97706;">🔄 استعادة القائمة المعتمدة</button>
                 <button class="btn-3d btn-logout-3d" onclick="logoutUser()">🚪 خروج</button>
             </div>
         </header>
 
+        <!-- التبويب 1 -->
         <div id="tab-main" class="tab-content active">
             <div class="grid-stats">
                 <div class="stat-card">
@@ -140,7 +147,7 @@
                     <div class="stat-icon" style="background: #d1fae5; color: #059669;">✅</div>
                 </div>
                 <div class="stat-card">
-                    <div><h3 id="stat-specialists" style="color: #7e22ce;">0</h3><p>إجمالي الأخصائيين المسجلين</p></div>
+                    <div><h3 id="stat-specialists" style="color: #7e22ce;">0</h3><p>إجمالي الأخصائيين المصرح لهم</p></div>
                     <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">👥</div>
                 </div>
             </div>
@@ -157,6 +164,7 @@
             </div>
         </div>
 
+        <!-- التبويب 2 -->
         <div id="tab-visits" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
@@ -184,25 +192,32 @@
             </div>
         </div>
 
+        <!-- التبويب 3 -->
         <div id="tab-staff" class="tab-content">
             <div class="card">
-                <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
-                <form id="staffForm" onsubmit="addStaff(event)">
+                <div class="card-title-colored">➕ إدارة بيانات الأخصائيين والموظفين</div>
+                <form id="staffForm" onsubmit="handleStaffSubmit(event)">
+                    <input type="hidden" id="editingStaffIndex" value="-1">
                     <div class="form-grid">
-                        <div class="form-group"><label>الرقم الوظيفي</label><input type="text" id="staffId" required placeholder="مثال: 1686553"></div>
+                        <div class="form-group"><label>الرقم الوظيفي (اسم المستخدم وكلمة المرور)</label><input type="text" id="staffId" required placeholder="مثال: 1686553"></div>
                         <div class="form-group"><label>الاسم الكامل</label><input type="text" id="staffName" required placeholder="اسم الموظف الثلاثي أو الرباعي"></div>
                         <div class="form-group"><label>القسم</label><select id="staffDept"><option value="قسم تقويم تعلم مواد العلوم التطبيقية">قسم تقويم تعلم مواد العلوم التطبيقية</option><option value="قسم تعلم مواد العلوم الانسانية والمهارات الفرديه">قسم تعلم مواد العلوم الانسانية والمهارات الفرديه</option></select></div>
                         <div class="form-group"><label>التخصص / المسمى الوظيفي</label><input type="text" id="staffSpec" placeholder="مثال: تقويم رياضيات / رئيس قسم"></div>
                     </div>
-                    <button type="submit" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
+                    
+                    <!-- أزرار الإضافة والتعديل والحذف متجاورة -->
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button type="submit" id="btnSaveStaff" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
+                        <button type="button" id="btnCancelEdit" onclick="resetStaffForm()" class="btn-action" style="display: none; color: #ef4444;">❌ إلغاء التعديل</button>
+                    </div>
                 </form>
             </div>
 
             <div class="card">
-                <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المعتمدين</div>
+                <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</div>
                 <div class="table-responsive">
                     <table>
-                        <thead><tr><th>الرقم الوظيفي</th><th>الاسم الكامل</th><th>القسم</th><th>التخصص / المسمى الوظيفي</th></tr></thead>
+                        <thead><tr><th>الرقم الوظيفي</th><th>الاسم الكامل</th><th>القسم</th><th>التخصص / المسمى الوظيفي</th><th>الإجراءات</th></tr></thead>
                         <tbody id="staffTableBody"></tbody>
                     </table>
                 </div>
@@ -212,6 +227,7 @@
 </div>
 
 <script>
+    // قائمة الأخصائيين المصرح لهم
     const officialSpecialists = [
         { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "رئيس قسم - رياضيات" },
         { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الفيزياء أول" },
@@ -239,9 +255,17 @@
         localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
     }
 
+    // التحقق من الدخول بالرقم الوظيفي أو حساب الـ Admin
     function handleLogin(e) {
         e.preventDefault();
-        if (document.getElementById('loginUser').value.trim() === 'admin' && document.getElementById('loginPass').value.trim() === 'admin') {
+        const user = document.getElementById('loginUser').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+
+        // السماح بالدخول بحساب admin أو عبر الرقم الوظيفي المسجل كـ اسم مستخدم وكلمة مرور
+        const isAuthorizedUser = specialists.some(s => s.id === user && pass === user);
+        const isAdmin = (user === 'admin' && pass === 'admin');
+
+        if (isAdmin || isAuthorizedUser) {
             sessionStorage.setItem('isLoggedIn', 'true');
             checkAuth();
         } else {
@@ -284,13 +308,11 @@
     }
 
     function updateUI() {
-        // تحديث كروت المؤشرات
         document.getElementById('stat-total-visits').textContent = visits.length;
         document.getElementById('stat-pending-visits').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
         document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
         document.getElementById('stat-specialists').textContent = specialists.length;
 
-        // تحديث العدادات الرقمية داخل أزرار التنقل الإعدادية
         document.getElementById('badge-tab-1').textContent = visits.length;
         document.getElementById('badge-tab-2').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
         document.getElementById('badge-tab-3').textContent = specialists.length;
@@ -311,12 +333,16 @@
             </tr>
         `).join('');
 
-        document.getElementById('staffTableBody').innerHTML = specialists.map(s => `
+        document.getElementById('staffTableBody').innerHTML = specialists.map((s, index) => `
             <tr>
                 <td>${s.id}</td>
                 <td><strong>${s.name}</strong></td>
                 <td>${s.dept}</td>
                 <td>${s.spec}</td>
+                <td>
+                    <button onclick="editStaff(${index})" class="btn-table-action btn-edit">✏️ تعديل</button>
+                    <button onclick="deleteStaff(${index})" class="btn-table-action btn-delete">🗑️ حذف</button>
+                </td>
             </tr>
         `).join('');
 
@@ -339,18 +365,56 @@
         switchTab('main');
     }
 
-    function addStaff(e) {
+    // التعامل مع إضافة أو تعديل بيانات الموظف
+    function handleStaffSubmit(e) {
         e.preventDefault();
-        specialists.push({
-            id: document.getElementById('staffId').value,
-            name: document.getElementById('staffName').value,
+        const editIndex = parseInt(document.getElementById('editingStaffIndex').value);
+        const staffData = {
+            id: document.getElementById('staffId').value.trim(),
+            name: document.getElementById('staffName').value.trim(),
             dept: document.getElementById('staffDept').value,
-            spec: document.getElementById('staffSpec').value
-        });
+            spec: document.getElementById('staffSpec').value.trim()
+        };
+
+        if (editIndex >= 0) {
+            specialists[editIndex] = staffData;
+            alert("تم تعديل بيانات الموظف بنجاح!");
+        } else {
+            specialists.push(staffData);
+            alert("تم إضافة الموظف ومنحه صلاحية الدخول برقمه الوظيفي بنجاح!");
+        }
+
         localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
-        document.getElementById('staffForm').reset();
+        resetStaffForm();
         updateUI();
-        alert("تم إضافة الموظف بنجاح!");
+    }
+
+    function editStaff(index) {
+        const staff = specialists[index];
+        document.getElementById('staffId').value = staff.id;
+        document.getElementById('staffName').value = staff.name;
+        document.getElementById('staffDept').value = staff.dept;
+        document.getElementById('staffSpec').value = staff.spec;
+        document.getElementById('editingStaffIndex').value = index;
+
+        document.getElementById('btnSaveStaff').innerHTML = "💾 حفظ التعديل";
+        document.getElementById('btnCancelEdit').style.display = "inline-flex";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteStaff(index) {
+        if (confirm(`هل أنت تأكد من حذف الموظف (${specialists[index].name}) وإلغاء صلاحية دخوله؟`)) {
+            specialists.splice(index, 1);
+            localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
+            updateUI();
+        }
+    }
+
+    function resetStaffForm() {
+        document.getElementById('staffForm').reset();
+        document.getElementById('editingStaffIndex').value = "-1";
+        document.getElementById('btnSaveStaff').innerHTML = "➕ إضافة الموظف";
+        document.getElementById('btnCancelEdit').style.display = "none";
     }
 
     function exportToExcel() {
