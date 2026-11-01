@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
+    <!-- مكتبات خارجية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --bg-color: #eef2f6; 
@@ -74,6 +76,7 @@
 <body>
 
 <div class="container">
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <div class="login-icon">🎓</div>
@@ -89,17 +92,18 @@
                     <input type="password" id="loginPass" required>
                 </div>
                 <div id="loginError" style="color: #ef4444; font-weight: 700; font-size: 14px; margin-bottom: 16px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
-                <button type="submit" class="btn-3d btn-tab-1" style="width: 100%; justify-content: center; padding: 12px;">تسجيل الدخول</button>
+                <button type="submit" class="btn-3d btn-tab-1" style="width: 100%; justify-content: center; padding: 12px;">🔑 تسجيل الدخول</button>
             </form>
         </div>
     </div>
 
+    <!-- لوحة التحكم -->
     <div id="dashboard-app" style="display: none;">
         <header>
             <div class="brand">
                 <div class="brand-icon">🎓</div>
                 <div>
-                    <h2 style="font-weight: 800;">موجز</h2>
+                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 3.0</span></h2>
                     <p style="color: var(--text-muted); font-size: 13px; font-weight: 600;">لوحة أخصائي تقويم المواد الميدانية</p>
                 </div>
             </div>
@@ -112,11 +116,12 @@
 
             <div class="header-actions">
                 <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
-                <button class="btn-action" onclick="resetData()" style="color: #d97706;">🔄 إعادة ضبط البيانات</button>
+                <button class="btn-action" onclick="resetData()" style="color: #d97706;">🔄 استعادة الأخصائيين المعتمدين</button>
                 <button class="btn-3d btn-logout-3d" onclick="logoutUser()">🚪 خروج</button>
             </div>
         </header>
 
+        <!-- التبويب 1 -->
         <div id="tab-main" class="tab-content active">
             <div class="grid-stats">
                 <div class="stat-card">
@@ -132,7 +137,7 @@
                     <div class="stat-icon" style="background: #d1fae5; color: #059669;">✅</div>
                 </div>
                 <div class="stat-card">
-                    <div><h3 id="stat-specialists" style="color: #7e22ce;">0</h3><p>إجمالي الأخصائيين</p></div>
+                    <div><h3 id="stat-specialists" style="color: #7e22ce;">0</h3><p>إجمالي الأخصائيين المسجلين</p></div>
                     <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">👥</div>
                 </div>
             </div>
@@ -149,18 +154,19 @@
             </div>
         </div>
 
+        <!-- التبويب 2 -->
         <div id="tab-visits" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
                 <form id="visitForm" onsubmit="addVisit(event)">
                     <div class="form-grid">
                         <div class="form-group"><label>الأخصائي الزائر</label><select id="visitSpecialist" required></select></div>
-                        <div class="form-group"><label>المدرسة / الجهة</label><input type="text" id="visitSchool" required></div>
-                        <div class="form-group"><label>المعلم المعني</label><input type="text" id="visitTeacher" required></div>
+                        <div class="form-group"><label>المدرسة / الجهة</label><input type="text" id="visitSchool" required placeholder="اسم المدرسة"></div>
+                        <div class="form-group"><label>المعلم المعني</label><input type="text" id="visitTeacher" required placeholder="اسم المعلم"></div>
                         <div class="form-group"><label>تاريخ الزيارة</label><input type="date" id="visitDate" required></div>
                         <div class="form-group"><label>حالة الزيارة</label><select id="visitStatus"><option value="مكتملة">مكتملة ومستقرة</option><option value="تتطلب متابعة">تتطلب متابعة عاجلة</option></select></div>
                     </div>
-                    <div class="form-group" style="margin-bottom: 20px;"><label>الملاحظات والتوصيات الميدانية</label><textarea id="visitNotes" rows="3"></textarea></div>
+                    <div class="form-group" style="margin-bottom: 20px;"><label>الملاحظات والتوصيات الميدانية</label><textarea id="visitNotes" rows="3" placeholder="أدخل الملاحظات هنا..."></textarea></div>
                     <button type="submit" class="btn-3d btn-tab-2">💾 حفظ الزيارة الميدانية</button>
                 </form>
             </div>
@@ -176,25 +182,26 @@
             </div>
         </div>
 
+        <!-- التبويب 3 -->
         <div id="tab-staff" class="tab-content">
             <div class="card">
                 <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
                 <form id="staffForm" onsubmit="addStaff(event)">
                     <div class="form-grid">
-                        <div class="form-group"><label>الرقم الوظيفي</label><input type="text" id="staffId" required></div>
-                        <div class="form-group"><label>الاسم الكامل</label><input type="text" id="staffName" required></div>
-                        <div class="form-group"><label>القسم</label><select id="staffDept"><option value="العلوم الإنسانية والمهارات الفردية">العلوم الإنسانية والمهارات الفردية</option><option value="العلوم التطبيقية">العلوم التطبيقية</option></select></div>
-                        <div class="form-group"><label>التخصص</label><input type="text" id="staffSpec"></div>
+                        <div class="form-group"><label>الرقم الوظيفي</label><input type="text" id="staffId" required placeholder="مثال: 1686553"></div>
+                        <div class="form-group"><label>الاسم الكامل</label><input type="text" id="staffName" required placeholder="اسم الموظف الثلاثي أو الرباعي"></div>
+                        <div class="form-group"><label>القسم</label><select id="staffDept"><option value="قسم تقويم تعلم مواد العلوم التطبيقية">قسم تقويم تعلم مواد العلوم التطبيقية</option><option value="قسم تعلم مواد العلوم الانسانية والمهارات الفرديه">قسم تعلم مواد العلوم الانسانية والمهارات الفرديه</option></select></div>
+                        <div class="form-group"><label>التخصص / المسمى الوظيفي</label><input type="text" id="staffSpec" placeholder="مثال: تقويم رياضيات / رئيس قسم"></div>
                     </div>
                     <button type="submit" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
                 </form>
             </div>
 
             <div class="card">
-                <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المسجلين</div>
+                <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المعتمدين</div>
                 <div class="table-responsive">
                     <table>
-                        <thead><tr><th>الرقم الوظيفي</th><th>الاسم الكامل</th><th>القسم</th><th>التخصص</th></tr></thead>
+                        <thead><tr><th>الرقم الوظيفي</th><th>الاسم الكامل</th><th>القسم</th><th>التخصص / المسمى الوظيفي</th></tr></thead>
                         <tbody id="staffTableBody"></tbody>
                     </table>
                 </div>
@@ -204,19 +211,38 @@
 </div>
 
 <script>
-    const defaultSpecialists = [
-        { id: '101', name: 'أحمد بن سعيد المفرجي', dept: 'العلوم التطبيقية', spec: 'تقويم رياضيات' },
-        { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' },
-        { id: '103', name: 'علي بن عبدالله الهنائي', dept: 'العلوم التطبيقية', spec: 'تقويم فيزياء' }
+    // البيانات الفعلية المعتمدة المستخرجة من المستندات المرفقة
+    const officialSpecialists = [
+        // أخصائيو العلوم التطبيقية
+        { id: "1686553", name: "ابراهيم بدر سيف سعود الشبيبي", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "رئيس قسم - رياضيات" },
+        { id: "16128287", name: "فاطمه سالم هدوب معيوف المغيرية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الفيزياء أول" },
+        { id: "16119223", name: "نصراء بنت مبارك بن سلطان الإسماعيلية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة تقنية المعلومات أول" },
+        { id: "16128341", name: "وليد بن مالك بن محمد الجهضمي", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الأحياء أول" },
+        { id: "16177726", name: "أفراح بنت مبارك بن ناجم الحجرية", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مجال ثان" },
+        { id: "1682354", name: "علي بن صابح بن سالم بني عرابه", dept: "قسم تقويم تعلم مواد العلوم التطبيقية", spec: "أخصائي تقويم مادة الرياضيات أول" },
+        
+        // أخصائيو العلوم الإنسانية والمهارات الفردية
+        { id: "1696508", name: "يوسف بن سليمان بن سالم المفرجي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "رئيس قسم" },
+        { id: "16143371", name: "سلطان محمد ناصر حمد الحارثي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة الرياضة المدرسية ثان" },
+        { id: "16125123", name: "رحمه محمد خالد علي المسكرية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة اللغة الإنجليزية ثان" },
+        { id: "1686518", name: "زبانه راشد محمد راشد البوسعيدية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة التاريخ أول" },
+        { id: "1686654", name: "اسماء حمود ناصر حمود السناوية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة اللغة العربية أول" },
+        { id: "16142588", name: "راشد بن محمد بن سالم الحارثي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة جغرافيا ثاني" },
+        { id: "16143513", name: "نسرین بنت حمد سيف الرواحية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مجال أول / ٢" },
+        { id: "16175869", name: "وردة بنت مبروك سويدان الحجرية", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم فنون تشكيلية / ٤" },
+        { id: "1686397", name: "محمد بن سالم بن محمد اليزيدي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة التربية الإسلامية أول" },
+        { id: "1694487", name: "سالم بن حميد بن سالم الحارثي", dept: "قسم تعلم مواد العلوم الانسانية والمهارات الفرديه", spec: "أخصائي تقويم مادة التربية الإسلامية" }
     ];
 
-    const defaultVisits = [
-        { specialist: 'أحمد بن سعيد المفرجي', school: 'مدرسة الأمل', teacher: 'محمد المعولي', date: '2026-10-25', status: 'تتطلب متابعة', notes: 'يحتاج لمتابعة خطة العلاج' },
-        { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
-    ];
+    // جلب البيانات أو تحميل القائمة الرسمية المعتمدة مباشرة
+    let specialists = JSON.parse(localStorage.getItem('mogaz_official_specs_v3')) || officialSpecialists;
+    let visits = JSON.parse(localStorage.getItem('mogaz_official_visits_v3')) || [];
 
-    let specialists = defaultSpecialists;
-    let visits = defaultVisits;
+    // تأكيد التحميل القسري للأسماء المعتمدة إذا كانت الذاكرة القديمة فارغة
+    if (!specialists || specialists.length === 0) {
+        specialists = officialSpecialists;
+        localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
+    }
 
     function handleLogin(e) {
         e.preventDefault();
@@ -247,11 +273,14 @@
     }
 
     function resetData() {
-        localStorage.clear();
-        specialists = defaultSpecialists;
-        visits = defaultVisits;
-        updateUI();
-        alert("تم إعادة ضبط البيانات بنجاح!");
+        if (confirm("هل تريد إعادة ضبط القائمة وإسترجاع الأخصائيين المعتمدين الـ 16؟")) {
+            localStorage.clear();
+            specialists = officialSpecialists;
+            visits = [];
+            localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
+            updateUI();
+            alert("تم إسترجاع قائمة الأخصائيين المعتمدين بنجاح!");
+        }
     }
 
     function switchTab(tabName) {
@@ -265,9 +294,12 @@
         document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
         document.getElementById('stat-specialists').textContent = specialists.length;
 
-        document.getElementById('visitSpecialist').innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.dept})</option>`).join('');
+        const select = document.getElementById('visitSpecialist');
+        select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.spec})</option>`).join('');
 
-        document.getElementById('visitsTableBody').innerHTML = visits.map(v => `
+        document.getElementById('visitsTableBody').innerHTML = visits.length === 0 ? 
+            '<tr><td colspan="6" style="text-align:center; color:#94a3b8; font-weight:700;">لا توجد زيارات مسجلة حتى الآن</td></tr>' :
+            visits.map(v => `
             <tr>
                 <td><strong>${v.specialist}</strong></td>
                 <td>${v.school}</td>
@@ -300,6 +332,7 @@
             status: document.getElementById('visitStatus').value,
             notes: document.getElementById('visitNotes').value
         });
+        localStorage.setItem('mogaz_official_visits_v3', JSON.stringify(visits));
         document.getElementById('visitForm').reset();
         updateUI();
         switchTab('main');
@@ -313,15 +346,21 @@
             dept: document.getElementById('staffDept').value,
             spec: document.getElementById('staffSpec').value
         });
+        localStorage.setItem('mogaz_official_specs_v3', JSON.stringify(specialists));
         document.getElementById('staffForm').reset();
         updateUI();
+        alert("تم إضافة الموظف بنجاح!");
     }
 
     function exportToExcel() {
+        if (visits.length === 0) {
+            alert("لا توجد زيارات مسجلة لتصديرها إلى Excel!");
+            return;
+        }
         const ws = XLSX.utils.json_to_sheet(visits);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "الزيارات الميدانية");
-        XLSX.writeFile(wb, "تقرير_الزيارات.xlsx");
+        XLSX.writeFile(wb, "تقرير_الزيارات_الميدانية.xlsx");
     }
 
     let barChart, doughnutChart;
@@ -329,17 +368,25 @@
         if (barChart) barChart.destroy();
         if (doughnutChart) doughnutChart.destroy();
 
+        const appliedDeptCount = visits.filter(v => {
+            const spec = specialists.find(s => s.name === v.specialist);
+            return spec && spec.dept.includes('العلوم التطبيقية');
+        }).length;
+
+        const humanitiesDeptCount = visits.filter(v => {
+            const spec = specialists.find(s => s.name === v.specialist);
+            return spec && spec.dept.includes('العلوم الانسانية');
+        }).length;
+
         barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['العلوم التطبيقية', 'العلوم الإنسانية'],
+                labels: ['العلوم التطبيقية', 'العلوم الإنسانية والمهارات الفردية'],
                 datasets: [{
                     label: 'عدد الزيارات',
-                    data: [
-                        visits.filter(v => specialists.find(s => s.name === v.specialist)?.dept === 'العلوم التطبيقية').length,
-                        visits.filter(v => specialists.find(s => s.name === v.specialist)?.dept === 'العلوم الإنسانية والمهارات الفردية').length
-                    ],
-                    backgroundColor: ['#2563eb', '#f59e0b']
+                    data: [appliedDeptCount, humanitiesDeptCount],
+                    backgroundColor: ['#2563eb', '#f59e0b'],
+                    borderRadius: 8
                 }]
             },
             options: { responsive: true }
@@ -348,7 +395,7 @@
         doughnutChart = new Chart(document.getElementById('doughnutChart').getContext('2d'), {
             type: 'doughnut',
             data: {
-                labels: ['مكتملة', 'تتطلب متابعة'],
+                labels: ['مكتملة ومستقرة', 'تتطلب متابعة'],
                 datasets: [{
                     data: [
                         visits.filter(v => v.status === 'مكتملة').length,
