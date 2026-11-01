@@ -85,7 +85,6 @@
             box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
         }
 
-        /* الهيدر العلوي */
         header {
             display: flex;
             justify-content: space-between;
@@ -119,7 +118,6 @@
             box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
         }
 
-        /* الأزرار ثلاثية الأبعاد 3D Nav Buttons */
         .nav-tabs-3d {
             display: flex;
             gap: 12px;
@@ -353,7 +351,7 @@
 
 <div class="container">
 
-    <!-- شاشة تسجيل الدخول 3D -->
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <div class="login-icon">🎓</div>
@@ -375,7 +373,7 @@
         </div>
     </div>
 
-    <!-- لوحة التحكم الحقيقية (مخفية تلقائياً حتى يتم تسجيل الدخول) -->
+    <!-- لوحة التحكم -->
     <div id="dashboard-app" style="display: none;">
         <header>
             <div class="brand">
@@ -386,7 +384,6 @@
                 </div>
             </div>
 
-            <!-- الأزرار ثلاثية الأبعاد 1، 2، 3 -->
             <div class="nav-tabs-3d">
                 <button class="btn-3d btn-tab-1" onclick="switchTab('main')">
                     <span class="badge-num">1</span>
@@ -407,7 +404,7 @@
             <div class="header-actions">
                 <button class="btn-action" onclick="toggleTheme()" title="تغيير الوضع">🌙 / ☀️</button>
                 <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
-                <!-- زر تسجيل الخروج ثلاثي الأبعاد -->
+                <button class="btn-action" onclick="resetDefaultData()" title="إعادة ضبط البيانات" style="color: #d97706;">🔄 إعادة ضبط</button>
                 <button class="btn-3d btn-logout-3d" onclick="logoutUser()">
                     <span>🚪 خروج</span>
                 </button>
@@ -568,19 +565,21 @@
 </div>
 
 <script>
-    let specialists = JSON.parse(localStorage.getItem('specialists')) || [
+    // البيانات المبدئية
+    const defaultSpecialists = [
         { id: '101', name: 'أحمد بن سعيد المفرجي', dept: 'العلوم التطبيقية', spec: 'تقويم رياضيات' },
         { id: '102', name: 'سارة بنت خالد البوسعيدية', dept: 'العلوم الإنسانية والمهارات الفردية', spec: 'تقويم لغة إنجليزية' }
     ];
 
-    let visits = JSON.parse(localStorage.getItem('visits')) || [
+    const defaultVisits = [
         { specialist: 'أحمد بن سعيد المفرجي', school: 'مدرسة الأمل', teacher: 'محمد المعولي', date: '2026-10-25', status: 'تتطلب متابعة', notes: 'يحتاج لمتابعة خطة العلاج' },
         { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
     ];
 
+    let specialists = JSON.parse(localStorage.getItem('specialists')) || defaultSpecialists;
+    let visits = JSON.parse(localStorage.getItem('visits')) || defaultVisits;
     let barChart, doughnutChart;
 
-    // معالجة تسجيل الدخول (admin / admin)
     function handleLogin(e) {
         e.preventDefault();
         const user = document.getElementById('loginUser').value.trim();
@@ -594,7 +593,6 @@
         }
     }
 
-    // التحقق من حالة تسجيل الدخول
     function checkAuth() {
         const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
         if (isLoggedIn) {
@@ -607,11 +605,21 @@
         }
     }
 
-    // تسجيل الخروج وإعادة التوجيه لصفحة الدخول
     function logoutUser() {
         if (confirm("هل تأكد رغبتك في تسجيل الخروج؟")) {
             sessionStorage.removeItem('isLoggedIn');
             checkAuth();
+        }
+    }
+
+    function resetDefaultData() {
+        if (confirm("هل تريد إعادة ضبط بيانات الأخصائيين والزيارات للوضع المبدئي؟")) {
+            specialists = defaultSpecialists;
+            visits = defaultVisits;
+            localStorage.setItem('specialists', JSON.stringify(specialists));
+            localStorage.setItem('visits', JSON.stringify(visits));
+            updateUI();
+            alert("تم إرجاع البيانات بنجاح!");
         }
     }
 
@@ -627,14 +635,19 @@
     }
 
     function updateUI() {
+        // تحديث كروت الإحصائيات
         document.getElementById('stat-total-visits').textContent = visits.length;
         document.getElementById('stat-pending-visits').textContent = visits.filter(v => v.status === 'تتطلب متابعة').length;
         document.getElementById('stat-completed-visits').textContent = visits.filter(v => v.status === 'مكتملة').length;
         document.getElementById('stat-specialists').textContent = specialists.length;
 
+        // خيارات الأخصائي الزائر
         const select = document.getElementById('visitSpecialist');
-        select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.dept})</option>`).join('');
+        if (select) {
+            select.innerHTML = specialists.map(s => `<option value="${s.name}">${s.name} (${s.dept})</option>`).join('');
+        }
 
+        // جدول الزيارات
         document.getElementById('visitsTableBody').innerHTML = visits.map(v => `
             <tr>
                 <td><strong>${v.specialist}</strong></td>
@@ -646,6 +659,7 @@
             </tr>
         `).join('');
 
+        // جدول الموظفين الأخصائيين
         document.getElementById('staffTableBody').innerHTML = specialists.map(s => `
             <tr>
                 <td>${s.id}</td>
@@ -736,7 +750,6 @@
     }
 
     document.getElementById('visitDate').valueAsDate = new Date();
-    // التحقق من تسجيل الدخول فور التحميل
     checkAuth();
 </script>
 </body>
