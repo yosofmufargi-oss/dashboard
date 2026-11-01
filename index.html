@@ -576,8 +576,13 @@
         { specialist: 'سارة بنت خالد البوسعيدية', school: 'مدرسة الشروق', teacher: 'فاطمة النبهانية', date: '2026-10-26', status: 'مكتملة', notes: 'ممتاز والتطبيق مكتمل' }
     ];
 
-    let specialists = JSON.parse(localStorage.getItem('specialists')) || defaultSpecialists;
-    let visits = JSON.parse(localStorage.getItem('visits')) || defaultVisits;
+    // ضمان التحميل القسري للأسماء إذا كانت الذاكرة المحلية فارغة
+    let savedSpecs = JSON.parse(localStorage.getItem('specialists'));
+    let specialists = (savedSpecs && savedSpecs.length > 0) ? savedSpecs : defaultSpecialists;
+
+    let savedVisits = JSON.parse(localStorage.getItem('visits'));
+    let visits = (savedVisits && savedVisits.length > 0) ? savedVisits : defaultVisits;
+
     let barChart, doughnutChart;
 
     function handleLogin(e) {
