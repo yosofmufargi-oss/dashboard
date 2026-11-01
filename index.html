@@ -11,14 +11,12 @@
     
     <style>
         :root {
-            /* خلفية مريحة للعين وفخمة (ليس أبيض) */
             --bg-color: #eef2f6; 
             --card-bg: #ffffff;
             --text-color: #1e293b;
             --text-muted: #64748b;
             --border-color: #cbd5e1;
             --primary: #2563eb;
-            /* ظلال ثلاثية الأبعاد بارزة */
             --shadow-3d: 0 10px 20px rgba(15, 23, 42, 0.08), 0 4px 6px rgba(15, 23, 42, 0.05);
             --inset-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
         }
@@ -54,7 +52,40 @@
             margin: 0 auto;
         }
 
-        /* الهيدر العلوي بنمط 3D */
+        /* شاشة تسجيل الدخول */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 36px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-3d);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+        }
+
+        /* الهيدر العلوي */
         header {
             display: flex;
             justify-content: space-between;
@@ -88,7 +119,7 @@
             box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
         }
 
-        /* الأزرار ثلاثية الأبعاد (3D Nav Buttons) */
+        /* الأزرار ثلاثية الأبعاد 3D Nav Buttons */
         .nav-tabs-3d {
             display: flex;
             gap: 12px;
@@ -135,7 +166,6 @@
         }
         .btn-tab-3:hover { background-color: #d97706; transform: translateY(-2px); }
 
-        /* زر تسجيل الخروج 3D */
         .btn-logout-3d {
             background-color: #ef4444;
             box-shadow: 0 5px 0 #b91c1c, 0 8px 15px rgba(239, 68, 68, 0.3);
@@ -175,7 +205,6 @@
             box-shadow: none;
         }
 
-        /* البطاقات ثلاثية الأبعاد 3D Cards */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -195,8 +224,6 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: relative;
-            overflow: hidden;
         }
 
         .stat-card h3 { font-size: 32px; font-weight: 800; }
@@ -241,7 +268,6 @@
             display: inline-block;
         }
 
-        /* تلوين النماذج والخانات المجسمة 3D Inputs */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -253,18 +279,15 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            text-align: right;
         }
 
         .form-group label {
             font-weight: 700;
             font-size: 14px;
-            color: #2563eb; /* تسمية ملونة أنيقة */
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: #2563eb;
         }
 
-        /* خانات إدخال ثلاثية الأبعاد بظلال غائرة 3D Inset Inputs */
         .form-group input, .form-group select, .form-group textarea {
             padding: 12px 16px;
             border-radius: 12px;
@@ -283,7 +306,6 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
-        /* الجداول ثلاثية الأبعاد */
         .table-responsive {
             overflow-x: auto;
             border-radius: 14px;
@@ -322,7 +344,7 @@
         .status-success { background: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }
 
         @media print {
-            header, .nav-tabs-3d, .header-actions, button, form { display: none !important; }
+            header, .nav-tabs-3d, .header-actions, button, form, #login-screen { display: none !important; }
             body { background: #fff; }
         }
     </style>
@@ -330,191 +352,216 @@
 <body>
 
 <div class="container">
-    <!-- الهيدر العلوي -->
-    <header>
-        <div class="brand">
-            <div class="brand-icon">🎓</div>
-            <div>
-                <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 2.5</span></h2>
-                <p style="color: var(--text-muted); font-size: 13px; font-weight: 600;">لوحة أخصائي تقويم المواد الميدانية</p>
-            </div>
-        </div>
 
-        <!-- الأزرار ثلاثية الأبعاد 1، 2، 3 -->
-        <div class="nav-tabs-3d">
-            <button class="btn-3d btn-tab-1" onclick="switchTab('main')">
-                <span class="badge-num">1</span>
-                <span>📊 الرئيسية والمؤشرات</span>
-            </button>
+    <!-- شاشة تسجيل الدخول 3D -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-icon">🎓</div>
+            <h2 style="font-weight: 800; margin-bottom: 6px;">موجز - تسجيل الدخول</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">يرجى إدخال اسم المستخدم وكلمة المرور للوصول للوحة</p>
             
-            <button class="btn-3d btn-tab-2" onclick="switchTab('visits')">
-                <span class="badge-num">2</span>
-                <span>📝 سجل الزيارات</span>
-            </button>
-            
-            <button class="btn-3d btn-tab-3" onclick="switchTab('staff')">
-                <span class="badge-num">3</span>
-                <span>👥 الموظفين والأخصائيين</span>
-            </button>
-        </div>
-
-        <div class="header-actions">
-            <button class="btn-action" onclick="toggleTheme()" title="تغيير الوضع">🌙 / ☀️</button>
-            <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
-            <!-- زر تسجيل الخروج ثلاثي الأبعاد -->
-            <button class="btn-3d btn-logout-3d" onclick="logoutUser()">
-                <span>🚪 خروج</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- التبويب 1 -->
-    <div id="tab-main" class="tab-content active">
-        <div class="grid-stats">
-            <div class="stat-card">
-                <div>
-                    <h3 id="stat-total-visits" style="color: #0284c7;">0</h3>
-                    <p>إجمالي الزيارات المسجلة</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label>👤 اسم المستخدم</label>
+                    <input type="text" id="loginUser" placeholder="أدخل اسم المستخدم" required>
                 </div>
-                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">📋</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3 id="stat-pending-visits" style="color: #d97706;">0</h3>
-                    <p>تتطلب متابعة عاجلة</p>
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label>🔒 كلمة المرور</label>
+                    <input type="password" id="loginPass" placeholder="أدخل كلمة المرور" required>
                 </div>
-                <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⚠️</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3 id="stat-completed-visits" style="color: #059669;">0</h3>
-                    <p>زيارات مكتملة ومستقرة</p>
-                </div>
-                <div class="stat-icon" style="background: #d1fae5; color: #059669;">✅</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3 id="stat-specialists" style="color: #7e22ce;">0</h3>
-                    <p>إجمالي الأخصائيين</p>
-                </div>
-                <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">👥</div>
-            </div>
-        </div>
-
-        <div class="charts-grid">
-            <div class="card">
-                <div class="card-title-colored">📊 توزيع الزيارات الميدانية حسب القسم</div>
-                <canvas id="barChart" height="200"></canvas>
-            </div>
-            <div class="card">
-                <div class="card-title-colored">🎯 حالة الزيارات والمتابعة</div>
-                <canvas id="doughnutChart" height="200"></canvas>
-            </div>
+                <div id="loginError" style="color: #ef4444; font-weight: 700; font-size: 14px; margin-bottom: 16px; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+                <button type="submit" class="btn-3d btn-tab-1" style="width: 100%; justify-content: center; padding: 12px;">🔑 تسجيل الدخول</button>
+            </form>
         </div>
     </div>
 
-    <!-- التبويب 2 -->
-    <div id="tab-visits" class="tab-content">
-        <div class="card">
-            <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
-            <form id="visitForm" onsubmit="addVisit(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>👤 الأخصائي الزائر</label>
-                        <select id="visitSpecialist" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label>🏫 المدرسة / الجهة</label>
-                        <input type="text" id="visitSchool" required placeholder="اسم المدرسة">
-                    </div>
-                    <div class="form-group">
-                        <label>👨‍🏫 المعلم المعني</label>
-                        <input type="text" id="visitTeacher" required placeholder="اسم المعلم">
-                    </div>
-                    <div class="form-group">
-                        <label>📅 تاريخ الزيارة</label>
-                        <input type="date" id="visitDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label>📌 حالة الزيارة</label>
-                        <select id="visitStatus">
-                            <option value="مكتملة">مكتملة ومستقرة</option>
-                            <option value="تتطلب متابعة">تتطلب متابعة عاجلة</option>
-                        </select>
-                    </div>
+    <!-- لوحة التحكم الحقيقية (مخفية تلقائياً حتى يتم تسجيل الدخول) -->
+    <div id="dashboard-app" style="display: none;">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">🎓</div>
+                <div>
+                    <h2 style="font-weight: 800;">موجز <span style="font-size: 12px; background: #dbeafe; color: #1e40af; padding: 3px 10px; border-radius: 8px;">إصدار 2.5</span></h2>
+                    <p style="color: var(--text-muted); font-size: 13px; font-weight: 600;">لوحة أخصائي تقويم المواد الميدانية</p>
                 </div>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label>💬 الملاحظات والتوصيات الميدانية</label>
-                    <textarea id="visitNotes" rows="3" placeholder="أدخل الملاحظات هنا..."></textarea>
-                </div>
-                <button type="submit" class="btn-3d btn-tab-2">💾 حفظ الزيارة الميدانية</button>
-            </form>
-        </div>
+            </div>
 
-        <div class="card">
-            <div class="card-title-colored">📜 سجل الزيارات المسجلة</div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الأخصائي</th>
-                            <th>المدرسة</th>
-                            <th>المعلم</th>
-                            <th>التاريخ</th>
-                            <th>الحالة</th>
-                            <th>الملاحظات</th>
-                        </tr>
-                    </thead>
-                    <tbody id="visitsTableBody"></tbody>
-                </table>
+            <!-- الأزرار ثلاثية الأبعاد 1، 2، 3 -->
+            <div class="nav-tabs-3d">
+                <button class="btn-3d btn-tab-1" onclick="switchTab('main')">
+                    <span class="badge-num">1</span>
+                    <span>📊 الرئيسية والمؤشرات</span>
+                </button>
+                
+                <button class="btn-3d btn-tab-2" onclick="switchTab('visits')">
+                    <span class="badge-num">2</span>
+                    <span>📝 سجل الزيارات</span>
+                </button>
+                
+                <button class="btn-3d btn-tab-3" onclick="switchTab('staff')">
+                    <span class="badge-num">3</span>
+                    <span>👥 الموظفين والأخصائيين</span>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <button class="btn-action" onclick="toggleTheme()" title="تغيير الوضع">🌙 / ☀️</button>
+                <button class="btn-action" onclick="exportToExcel()" style="color: #059669;">📊 تصدير Excel</button>
+                <!-- زر تسجيل الخروج ثلاثي الأبعاد -->
+                <button class="btn-3d btn-logout-3d" onclick="logoutUser()">
+                    <span>🚪 خروج</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- التبويب 1 -->
+        <div id="tab-main" class="tab-content active">
+            <div class="grid-stats">
+                <div class="stat-card">
+                    <div>
+                        <h3 id="stat-total-visits" style="color: #0284c7;">0</h3>
+                        <p>إجمالي الزيارات المسجلة</p>
+                    </div>
+                    <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;">📋</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <h3 id="stat-pending-visits" style="color: #d97706;">0</h3>
+                        <p>تتطلب متابعة عاجلة</p>
+                    </div>
+                    <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⚠️</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <h3 id="stat-completed-visits" style="color: #059669;">0</h3>
+                        <p>زيارات مكتملة ومستقرة</p>
+                    </div>
+                    <div class="stat-icon" style="background: #d1fae5; color: #059669;">✅</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <h3 id="stat-specialists" style="color: #7e22ce;">0</h3>
+                        <p>إجمالي الأخصائيين</p>
+                    </div>
+                    <div class="stat-icon" style="background: #f3e8ff; color: #7e22ce;">👥</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="card">
+                    <div class="card-title-colored">📊 توزيع الزيارات الميدانية حسب القسم</div>
+                    <canvas id="barChart" height="200"></canvas>
+                </div>
+                <div class="card">
+                    <div class="card-title-colored">🎯 حالة الزيارات والمتابعة</div>
+                    <canvas id="doughnutChart" height="200"></canvas>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- التبويب 3 -->
-    <div id="tab-staff" class="tab-content">
-        <div class="card">
-            <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
-            <form id="staffForm" onsubmit="addStaff(event)">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>🆔 الرقم الوظيفي</label>
-                        <input type="text" id="staffId" required placeholder="مثال: 1024">
+        <!-- التبويب 2 -->
+        <div id="tab-visits" class="tab-content">
+            <div class="card">
+                <div class="card-title-colored">📝 تسجيل زيارة ميدانية جديدة</div>
+                <form id="visitForm" onsubmit="addVisit(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>👤 الأخصائي الزائر</label>
+                            <select id="visitSpecialist" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>🏫 المدرسة / الجهة</label>
+                            <input type="text" id="visitSchool" required placeholder="اسم المدرسة">
+                        </div>
+                        <div class="form-group">
+                            <label>👨‍🏫 المعلم المعني</label>
+                            <input type="text" id="visitTeacher" required placeholder="اسم المعلم">
+                        </div>
+                        <div class="form-group">
+                            <label>📅 تاريخ الزيارة</label>
+                            <input type="date" id="visitDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>📌 حالة الزيارة</label>
+                            <select id="visitStatus">
+                                <option value="مكتملة">مكتملة ومستقرة</option>
+                                <option value="تتطلب متابعة">تتطلب متابعة عاجلة</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>👤 الاسم الكامل</label>
-                        <input type="text" id="staffName" required placeholder="اسم الموظف">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label>💬 الملاحظات والتوصيات الميدانية</label>
+                        <textarea id="visitNotes" rows="3" placeholder="أدخل الملاحظات هنا..."></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>🏛️ القسم</label>
-                        <select id="staffDept">
-                            <option value="العلوم الإنسانية والمهارات الفردية">العلوم الإنسانية والمهارات الفردية</option>
-                            <option value="العلوم التطبيقية">العلوم التطبيقية</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>📚 التخصص</label>
-                        <input type="text" id="staffSpec" placeholder="مثال: رياضيات / لغة عربية">
-                    </div>
+                    <button type="submit" class="btn-3d btn-tab-2">💾 حفظ الزيارة الميدانية</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-title-colored">📜 سجل الزيارات المسجلة</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الأخصائي</th>
+                                <th>المدرسة</th>
+                                <th>المعلم</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitsTableBody"></tbody>
+                    </table>
                 </div>
-                <button type="submit" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
-            </form>
+            </div>
         </div>
 
-        <div class="card">
-            <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المسجلين</div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>الرقم الوظيفي</th>
-                            <th>الاسم الكامل</th>
-                            <th>القسم</th>
-                            <th>التخصص</th>
-                        </tr>
-                    </thead>
-                    <tbody id="staffTableBody"></tbody>
-                </table>
+        <!-- التبويب 3 -->
+        <div id="tab-staff" class="tab-content">
+            <div class="card">
+                <div class="card-title-colored">➕ إضافة أخصائي / موظف جديد</div>
+                <form id="staffForm" onsubmit="addStaff(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>🆔 الرقم الوظيفي</label>
+                            <input type="text" id="staffId" required placeholder="مثال: 1024">
+                        </div>
+                        <div class="form-group">
+                            <label>👤 الاسم الكامل</label>
+                            <input type="text" id="staffName" required placeholder="اسم الموظف">
+                        </div>
+                        <div class="form-group">
+                            <label>🏛️ القسم</label>
+                            <select id="staffDept">
+                                <option value="العلوم الإنسانية والمهارات الفردية">العلوم الإنسانية والمهارات الفردية</option>
+                                <option value="العلوم التطبيقية">العلوم التطبيقية</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>📚 التخصص</label>
+                            <input type="text" id="staffSpec" placeholder="مثال: رياضيات / لغة عربية">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-3d btn-tab-3">➕ إضافة الموظف</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-title-colored">👥 قائمة الموظفين والأخصائيين المسجلين</div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الرقم الوظيفي</th>
+                                <th>الاسم الكامل</th>
+                                <th>القسم</th>
+                                <th>التخصص</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -533,6 +580,41 @@
 
     let barChart, doughnutChart;
 
+    // معالجة تسجيل الدخول (admin / admin)
+    function handleLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('loginUser').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+
+        if (user === 'admin' && pass === 'admin') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            checkAuth();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    // التحقق من حالة تسجيل الدخول
+    function checkAuth() {
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+        if (isLoggedIn) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-app').style.display = 'block';
+            updateUI();
+        } else {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('dashboard-app').style.display = 'none';
+        }
+    }
+
+    // تسجيل الخروج وإعادة التوجيه لصفحة الدخول
+    function logoutUser() {
+        if (confirm("هل تأكد رغبتك في تسجيل الخروج؟")) {
+            sessionStorage.removeItem('isLoggedIn');
+            checkAuth();
+        }
+    }
+
     function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
@@ -542,13 +624,6 @@
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', nextTheme);
-    }
-
-    function logoutUser() {
-        if(confirm("هل تأكد رغبتك في تسجيل الخروج؟")) {
-            alert("تم تسجيل الخروج بنجاح.");
-            location.reload();
-        }
     }
 
     function updateUI() {
@@ -661,7 +736,8 @@
     }
 
     document.getElementById('visitDate').valueAsDate = new Date();
-    updateUI();
+    // التحقق من تسجيل الدخول فور التحميل
+    checkAuth();
 </script>
 </body>
 </html>
