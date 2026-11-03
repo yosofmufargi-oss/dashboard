@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
+            --text-color: #1e293b;
             --border-color: #e2e8f0;
         }
 
@@ -20,527 +20,77 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
+            color: var(--text-color);
+            direction: rtl;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        header {
+        /* Login Screen */
+        #loginScreen {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--card-bg);
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-brand .logo {
-            font-size: 2rem;
-        }
-
-        .header-brand h2 {
-            font-size: 1.25rem;
-            color: var(--text-main);
-        }
-
-        .header-brand h2 span {
-            font-size: 0.8rem;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-right: 5px;
-        }
-
-        .header-brand p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* News Ticker Oval Styling */
-        .news-ticker-oval {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #ffffff;
-            border-radius: 50px;
-            padding: 4px 14px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-            width: 320px;
-            height: 48px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .ticker-content {
-            display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            max-width: 400px;
+            text-align: center;
         }
 
-        .ticker-content img {
-            max-height: 100%;
-            max-width: 100%;
-            object-fit: contain;
-            border-radius: 20px;
-            transition: opacity 0.4s ease-in-out;
+        .login-card h2 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
         }
 
-        .no-news-text {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        .login-card p {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
         }
 
-        .btn-manage-news {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            padding: 4px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .btn-manage-news:hover {
-            background: #f1f5f9;
-        }
-
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .stat-card h3 {
-            font-size: 1.8rem;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .stat-card p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-        }
-
-        .stat-icon {
-            font-size: 2rem;
-        }
-
-        /* Charts Section */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        @media (max-width: 500px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .chart-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .chart-card .title {
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-main);
-        }
-
-        .placeholder-chart {
-            height: 200px;
-            background: #f1f5f9;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-
-        /* Tables & Content Cards */
-        .content-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-        }
-
-        .content-card .title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .form-group {
+            margin-bottom: 1.25rem;
             text-align: right;
         }
 
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 0.9rem;
-        }
-
-        th {
-            background: #f8fafc;
-            color: var(--text-muted);
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
             font-weight: 600;
         }
 
-        /* Modal */
-        .news-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .news-modal-content {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 20px;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .news-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .close-modal-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        .custom-file-upload {
-            border: 1px dashed #cbd5e1;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            background: #f8fafc;
-            display: block;
-            margin-bottom: 15px;
-        }
-
-        .news-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 0.75rem;
             border: 1px solid var(--border-color);
-            margin-bottom: 8px;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
         }
 
-        .news-item img {
-            width: 50px;
-            height: 30px;
-            object-fit: cover;
-            border-radius: 4px;
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--secondary-color);
         }
 
-        .delete-news-btn {
-            background: #ef4444;
+        .btn {
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
             cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container">
-        <!-- Header Section -->
-        <header>
-            <div class="header-brand">
-                <div class="logo">🎓</div>
-                <div>
-                    <h2>موجز <span>إصدار 3.2</span></h2>
-                    <p>لوحة أخصائي تقويم المواد الميدانية</p>
-                </div>
-            </div>
-
-            <!-- الشريط الإخباري البيضاوي -->
-            <div class="news-ticker-oval" id="newsTicker">
-                <div class="ticker-content">
-                    <img id="newsImage" src="" alt="خبر" style="display:none;" />
-                    <span id="noNewsText" class="no-news-text">لا توجد أخبار حالياً</span>
-                </div>
-                <button id="manageNewsBtn" class="btn-manage-news" onclick="openNewsModal()" title="إدارة الأخبار">⚙️</button>
-            </div>
-        </header>
-
-        <!-- Dynamic Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div>
-                    <h3>0</h3>
-                    <p>إجمالي الزيارات المسجلة</p>
-                </div>
-                <div class="stat-icon">📋</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3>0</h3>
-                    <p>تتطلب متابعة عاجلة</p>
-                </div>
-                <div class="stat-icon">⚠️</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3>0</h3>
-                    <p>زيارات مكتملة ومستقرة</p>
-                </div>
-                <div class="stat-icon">✅</div>
-            </div>
-            <div class="stat-card">
-                <div>
-                    <h3>0</h3>
-                    <p>إجمالي الأخصائيين المصرح لهم</p>
-                </div>
-                <div class="stat-icon">👥</div>
-            </div>
-        </div>
-
-        <!-- Dynamic Charts Section -->
-        <div class="charts-grid">
-            <div class="chart-card">
-                <div class="title">📊 توزيع الزيارات الميدانية حسب القسم</div>
-                <div class="placeholder-chart">رسم بياني لتوزيع الزيارات</div>
-            </div>
-            <div class="chart-card">
-                <div class="title">🎯 حالة الزيارات والمتابعة</div>
-                <div class="placeholder-chart">رسم بياني لحالة المتابعة</div>
-            </div>
-        </div>
-
-        <!-- Field Visits Log Table -->
-        <div class="content-card">
-            <div class="title">📜 سجل الزيارات المسجلة</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الأخصائي</th>
-                        <th>المدرسة</th>
-                        <th>المعلم</th>
-                        <th>التاريخ</th>
-                        <th>الحالة</th>
-                        <th>الملاحظات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="6" style="text-align: center; color: var(--text-muted);">لا توجد زيارات مسجلة حالياً</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Staff List Table -->
-        <div class="content-card">
-            <div class="title">👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>الرقم الوظيفي</th>
-                        <th>الاسم الكامل</th>
-                        <th>القسم</th>
-                        <th>التخصص / المسمى الوظيفي</th>
-                        <th>الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="5" style="text-align: center; color: var(--text-muted);">لا يوجد أخصائيون مسجلون</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal for News Management -->
-    <div class="news-modal-overlay" id="newsModal">
-        <div class="news-modal-content">
-            <div class="news-modal-header">
-                <h3 style="font-size: 1rem;">🖼️ إدارة صور الأخبار</h3>
-                <button class="close-modal-btn" onclick="closeNewsModal()">&times;</button>
-            </div>
-            
-            <label for="imageInput" class="custom-file-upload">
-                📤 اضغط هنا لاختيار صورة خبر جديد
-            </label>
-            <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
-
-            <div id="newsList"></div>
-        </div>
-    </div>
-
-    <!-- JavaScript Execution Logic -->
-    <script>
-        let newsImages = JSON.parse(localStorage.getItem('news_images') || '[]');
-        let currentIndex = 0;
-        let tickerInterval = null;
-
-        function updateTicker() {
-            const imgEl = document.getElementById('newsImage');
-            const textEl = document.getElementById('noNewsText');
-
-            if (!newsImages || newsImages.length === 0) {
-                imgEl.style.display = 'none';
-                textEl.style.display = 'inline';
-                return;
-            }
-
-            textEl.style.display = 'none';
-            imgEl.style.display = 'block';
-
-            imgEl.style.opacity = 0;
-            setTimeout(() => {
-                if (newsImages[currentIndex]) {
-                    imgEl.src = newsImages[currentIndex];
-                    imgEl.style.opacity = 1;
-                }
-                currentIndex = (currentIndex + 1) % newsImages.length;
-            }, 200);
-        }
-
-        function startTicker() {
-            if (tickerInterval) clearInterval(tickerInterval);
-            updateTicker();
-            if (newsImages.length > 0) {
-                tickerInterval = setInterval(updateTicker, 2000);
-            }
-        }
-
-        const tickerEl = document.getElementById('newsTicker');
-        tickerEl.addEventListener('mouseenter', () => clearInterval(tickerInterval));
-        tickerEl.addEventListener('mouseleave', () => {
-            if (newsImages.length > 0) tickerInterval = setInterval(updateTicker, 2000);
-        });
-
-        function openNewsModal() {
-            renderNewsList();
-            document.getElementById('newsModal').style.display = 'flex';
-        }
-
-        function closeNewsModal() {
-            document.getElementById('newsModal').style.display = 'none';
-        }
-
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                newsImages.push(e.target.result);
-                localStorage.setItem('news_images', JSON.stringify(newsImages));
-                renderNewsList();
-                startTicker();
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
-        }
-
-        function deleteNews(index) {
-            newsImages.splice(index, 1);
-            localStorage.setItem('news_images', JSON.stringify(newsImages));
-            if (currentIndex >= newsImages.length) currentIndex = 0;
-            renderNewsList();
-            startTicker();
-        }
-
-        function renderNewsList() {
-            const listEl = document.getElementById('newsList');
-            listEl.innerHTML = '';
-
-            if (newsImages.length === 0) {
-                listEl.innerHTML = '<p style="text-align:center; color:#94a3b8; font-size:0.85rem;">لا توجد صور مرفوعة حالياً</p>';
-                return;
-            }
-
-            newsImages.forEach((imgSrc, idx) => {
-                const item = document.createElement('div');
-                item.className = 'news-item';
-                item.innerHTML = `
-                    <img src="${imgSrc}" alt="خبر ${idx + 1}">
-                    <span style="font-size:0.85rem;">خبر رقم ${idx + 1}</span>
-                    <button class="delete-news-btn" onclick="deleteNews(${idx})">حذف</button>
-                `;
-                listEl.appendChild(item);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', startTicker);
-    </script>
-</body>
-</html>
+            font-weight: 600;
+            width: 100
