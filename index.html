@@ -5,23 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
     
-    <!-- CSS الخاص بالشريط الإخباري والنافذة المنبثقة -->
     <style>
-        /* === تنسيق الشريط الإخباري البيضاوي === */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-brand .logo {
+            font-size: 2rem;
+        }
+
+        .header-brand h2 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .header-brand h2 span {
+            font-size: 0.8rem;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-right: 5px;
+        }
+
+        .header-brand p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* News Ticker Oval Styling */
         .news-ticker-oval {
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #ffffff;
-            border-radius: 50px; /* شكل بيضاوي */
+            border-radius: 50px;
             padding: 4px 14px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             width: 320px;
             height: 48px;
             overflow: hidden;
             position: relative;
-            margin: 0 15px;
         }
 
         .ticker-content {
@@ -43,7 +113,7 @@
 
         .no-news-text {
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-muted);
         }
 
         .btn-manage-news {
@@ -63,7 +133,110 @@
             background: #f1f5f9;
         }
 
-        /* === تنسيق النافذة المنبثقة (Modal) لإدارة الأخبار === */
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .stat-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 500px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-card .title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .placeholder-chart {
+            height: 200px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+
+        /* Tables & Content Cards */
+        .content-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .content-card .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #f8fafc;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Modal */
         .news-modal-overlay {
             display: none;
             position: fixed;
@@ -84,24 +257,15 @@
             width: 90%;
             max-width: 450px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
         }
 
         .news-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
             margin-bottom: 15px;
-        }
-
-        .news-modal-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: #1e293b;
         }
 
         .close-modal-btn {
@@ -109,39 +273,19 @@
             border: none;
             font-size: 1.2rem;
             cursor: pointer;
-            color: #64748b;
-        }
-
-        .upload-section {
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .upload-section input[type="file"] {
-            display: none;
+            color: var(--text-muted);
         }
 
         .custom-file-upload {
             border: 1px dashed #cbd5e1;
-            padding: 8px 12px;
+            padding: 10px;
             border-radius: 6px;
             cursor: pointer;
             width: 100%;
             text-align: center;
             background: #f8fafc;
-            color: #334155;
-            font-size: 0.9rem;
-        }
-
-        .custom-file-upload:hover {
-            background: #f1f5f9;
-        }
-
-        .news-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            display: block;
+            margin-bottom: 15px;
         }
 
         .news-item {
@@ -151,12 +295,13 @@
             background: #f8fafc;
             padding: 8px;
             border-radius: 6px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
         }
 
         .news-item img {
-            width: 60px;
-            height: 35px;
+            width: 50px;
+            height: 30px;
             object-fit: cover;
             border-radius: 4px;
         }
@@ -168,64 +313,143 @@
             padding: 4px 8px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .delete-news-btn:hover {
-            background: #dc2626;
         }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر الرئيسي مع إضافة الشريط البيضاوي -->
-    <header style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: #fff; border-bottom: 1px solid #e2e8f0;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="font-size: 2rem;">🎓</div>
-            <div>
-                <h2 style="margin: 0; font-size: 1.2rem;">موجز <span style="font-size: 0.8rem; color: #3b82f6;">إصدار 3.2</span></h2>
-                <p style="margin: 0; font-size: 0.85rem; color: #64748b;">لوحة أخصائي تقويم المواد الميدانية</p>
+    <div class="container">
+        <!-- Header Section -->
+        <header>
+            <div class="header-brand">
+                <div class="logo">🎓</div>
+                <div>
+                    <h2>موجز <span>إصدار 3.2</span></h2>
+                    <p>لوحة أخصائي تقويم المواد الميدانية</p>
+                </div>
+            </div>
+
+            <!-- الشريط الإخباري البيضاوي -->
+            <div class="news-ticker-oval" id="newsTicker">
+                <div class="ticker-content">
+                    <img id="newsImage" src="" alt="خبر" style="display:none;" />
+                    <span id="noNewsText" class="no-news-text">لا توجد أخبار حالياً</span>
+                </div>
+                <button id="manageNewsBtn" class="btn-manage-news" onclick="openNewsModal()" title="إدارة الأخبار">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Dynamic Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>
+                    <h3>0</h3>
+                    <p>إجمالي الزيارات المسجلة</p>
+                </div>
+                <div class="stat-icon">📋</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3>0</h3>
+                    <p>تتطلب متابعة عاجلة</p>
+                </div>
+                <div class="stat-icon">⚠️</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3>0</h3>
+                    <p>زيارات مكتملة ومستقرة</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3>0</h3>
+                    <p>إجمالي الأخصائيين المصرح لهم</p>
+                </div>
+                <div class="stat-icon">👥</div>
             </div>
         </div>
 
-        <!-- 🟢 الشريط الإخباري البيضاوي -->
-        <div class="news-ticker-oval" id="newsTicker">
-            <div class="ticker-content">
-                <img id="newsImage" src="" alt="خبر" style="display:none;" />
-                <span id="noNewsText" class="no-news-text">لا توجد أخبار حالياً</span>
+        <!-- Dynamic Charts Section -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="title">📊 توزيع الزيارات الميدانية حسب القسم</div>
+                <div class="placeholder-chart">رسم بياني لتوزيع الزيارات</div>
             </div>
-            <button id="manageNewsBtn" class="btn-manage-news" onclick="openNewsModal()" title="إدارة الأخبار">⚙️</button>
+            <div class="chart-card">
+                <div class="title">🎯 حالة الزيارات والمتابعة</div>
+                <div class="placeholder-chart">رسم بياني لحالة المتابعة</div>
+            </div>
         </div>
-    </header>
 
-    <!-- 🟢 النافذة المنبثقة لإدارة الأخبار (Modal) -->
-    <div class="news-modal-overlay" id="newsModal">
-        <div class="news-modal-content">
-            <div class="news-modal-header">
-                <h3>🖼️ إدارة صور الأخبار</h3>
-                <button class="close-modal-btn" onclick="closeNewsModal()">&times;</button>
-            </div>
-            
-            <div class="upload-section">
-                <label for="imageInput" class="custom-file-upload">
-                    📤 اضغط هنا لاختيار صورة خبر جديد
-                </label>
-                <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-            </div>
+        <!-- Field Visits Log Table -->
+        <div class="content-card">
+            <div class="title">📜 سجل الزيارات المسجلة</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الأخصائي</th>
+                        <th>المدرسة</th>
+                        <th>المعلم</th>
+                        <th>التاريخ</th>
+                        <th>الحالة</th>
+                        <th>الملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted);">لا توجد زيارات مسجلة حالياً</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-            <div class="news-list" id="newsList">
-                <!-- يتم توليد عناصر الأخبار هنا تلقائياً -->
-            </div>
+        <!-- Staff List Table -->
+        <div class="content-card">
+            <div class="title">👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرقم الوظيفي</th>
+                        <th>الاسم الكامل</th>
+                        <th>القسم</th>
+                        <th>التخصص / المسمى الوظيفي</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted);">لا يوجد أخصائيون مسجلون</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- JavaScript الخاص بالتشغيل والتفاعل -->
+    <!-- Modal for News Management -->
+    <div class="news-modal-overlay" id="newsModal">
+        <div class="news-modal-content">
+            <div class="news-modal-header">
+                <h3 style="font-size: 1rem;">🖼️ إدارة صور الأخبار</h3>
+                <button class="close-modal-btn" onclick="closeNewsModal()">&times;</button>
+            </div>
+            
+            <label for="imageInput" class="custom-file-upload">
+                📤 اضغط هنا لاختيار صورة خبر جديد
+            </label>
+            <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+
+            <div id="newsList"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript Execution Logic -->
     <script>
         let newsImages = JSON.parse(localStorage.getItem('news_images') || '[]');
         let currentIndex = 0;
         let tickerInterval = null;
 
-        // تحديث إطار عرض الصور كل ثانيتين
         function updateTicker() {
             const imgEl = document.getElementById('newsImage');
             const textEl = document.getElementById('noNewsText');
@@ -239,7 +463,6 @@
             textEl.style.display = 'none';
             imgEl.style.display = 'block';
 
-            // تأثير اختفاء وظهور ناعم
             imgEl.style.opacity = 0;
             setTimeout(() => {
                 if (newsImages[currentIndex]) {
@@ -250,7 +473,6 @@
             }, 200);
         }
 
-        // بدء الدوران التلقائي كل ثانيتين (2000 مللي ثانية)
         function startTicker() {
             if (tickerInterval) clearInterval(tickerInterval);
             updateTicker();
@@ -259,14 +481,12 @@
             }
         }
 
-        // إيقاف التبديل عند توجيه الماوس على الخبر لرؤيته بوضوح
         const tickerEl = document.getElementById('newsTicker');
         tickerEl.addEventListener('mouseenter', () => clearInterval(tickerInterval));
         tickerEl.addEventListener('mouseleave', () => {
             if (newsImages.length > 0) tickerInterval = setInterval(updateTicker, 2000);
         });
 
-        // فتح وإغلاق النافذة المنبثقة
         function openNewsModal() {
             renderNewsList();
             document.getElementById('newsModal').style.display = 'flex';
@@ -276,7 +496,6 @@
             document.getElementById('newsModal').style.display = 'none';
         }
 
-        // رفع وتخزين صورة جديدة
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -289,10 +508,9 @@
                 startTicker();
             };
             reader.readAsDataURL(file);
-            event.target.value = ''; // إعادة تعيين مدخل الملف
+            event.target.value = '';
         }
 
-        // حذف صورة خبر
         function deleteNews(index) {
             newsImages.splice(index, 1);
             localStorage.setItem('news_images', JSON.stringify(newsImages));
@@ -301,7 +519,6 @@
             startTicker();
         }
 
-        // عرض قائمة الأخبار المرفوعة داخل النافذة المنبثقة
         function renderNewsList() {
             const listEl = document.getElementById('newsList');
             listEl.innerHTML = '';
@@ -316,14 +533,13 @@
                 item.className = 'news-item';
                 item.innerHTML = `
                     <img src="${imgSrc}" alt="خبر ${idx + 1}">
-                    <span>خبر رقم ${idx + 1}</span>
+                    <span style="font-size:0.85rem;">خبر رقم ${idx + 1}</span>
                     <button class="delete-news-btn" onclick="deleteNews(${idx})">حذف</button>
                 `;
                 listEl.appendChild(item);
             });
         }
 
-        // التشغيل التلقائي عند فتح الصفحة
         document.addEventListener('DOMContentLoaded', startTicker);
     </script>
 </body>
