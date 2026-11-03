@@ -93,4 +93,271 @@
             border-radius: 0.5rem;
             cursor: pointer;
             font-weight: 600;
-            width: 100
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* Dashboard Screen */
+        #dashboardScreen {
+            display: none;
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-brand .logo {
+            font-size: 2rem;
+        }
+
+        .header-brand h2 span {
+            font-size: 0.75rem;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .stat-icon {
+            font-size: 1.75rem;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .chart-card .title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Tables & Content Cards */
+        .content-card {
+            background: var(--card-bg);
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .content-card .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎓</div>
+            <h2>موجز - تسجيل الدخول</h2>
+            <p>اسم المستخدم وكلمة المرور هما الرقم الوظيفي الخاص بك (أو admin)</p>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>الرقم الوظيفي / اسم المستخدم</label>
+                    <input type="text" id="usernameInput" required placeholder="أدخل الرقم الوظيفي">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="passwordInput" required placeholder="أدخل كلمة المرور">
+                </div>
+                <button type="submit" class="btn">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم الرئيسية -->
+    <div id="dashboardScreen">
+        <header>
+            <div class="header-brand">
+                <div class="logo">🎓</div>
+                <div>
+                    <h2>موجز <span>إصدار 3.2</span></h2>
+                    <p>لوحة أخصائي تقويم المواد الميدانية</p>
+                </div>
+            </div>
+            <button class="btn" style="width: auto; background: #ef4444;" onclick="handleLogout()">تسجيل الخروج</button>
+        </header>
+
+        <!-- كروت الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>
+                    <h3 id="totalVisits">0</h3>
+                    <p>إجمالي الزيارات المسجلة</p>
+                </div>
+                <div class="stat-icon">📋</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="urgentVisits">0</h3>
+                    <p>تتطلب متابعة عاجلة</p>
+                </div>
+                <div class="stat-icon">⚠️</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="completedVisits">0</h3>
+                    <p>زيارات مكتملة ومستقرة</p>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-card">
+                <div>
+                    <h3 id="totalStaff">0</h3>
+                    <p>إجمالي الأخصائيين المصرح لهم</p>
+                </div>
+                <div class="stat-icon">👥</div>
+            </div>
+        </div>
+
+        <!-- الرسم البياني -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="title">📊 توزيع الزيارات الميدانية حسب القسم</div>
+                <canvas id="deptChart" height="200"></canvas>
+            </div>
+            <div class="chart-card">
+                <div class="title">🎯 حالة الزيارات والمتابعة</div>
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- جدول الزيارات الميدانية -->
+        <div class="content-card">
+            <div class="title">📜 سجل الزيارات المسجلة</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الأخصائي</th>
+                        <th>المدرسة</th>
+                        <th>المعلم</th>
+                        <th>التاريخ</th>
+                        <th>الحالة</th>
+                        <th>الملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody id="visitsTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #64748b;">لا توجد زيارات مسجلة حالياً</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- جدول الأخصائيين والموظفين -->
+        <div class="content-card">
+            <div class="title">👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرقم الوظيفي</th>
+                        <th>الاسم الكامل</th>
+                        <th>القسم</th>
+                        <th>التخصص / المسمى الوظيفي</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #64748b;">لا يوجد أخصائيون مسجلون</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(e) {
+            e.preventDefault();
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardScreen').style.display = 'block';
+        }
+
+        function handleLogout() {
+            document.getElementById('dashboardScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
