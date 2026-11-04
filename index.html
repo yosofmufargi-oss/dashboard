@@ -2,7 +2,827 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="wi<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
+    <!-- Chart.js for Dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1e40af;
+            --secondary: #0d9488;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Login Screen */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-header-org {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 16px;
+        }
+
+        .moe-logo-icon {
+            width: 54px;
+            height: 54px;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 12px;
+            border: 2px solid #dbeafe;
+        }
+
+        .login-org-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .login-org-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .login-org-dept {
+            font-size: 12px;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .login-card h2 {
+            font-size: 22px;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-logout {
+            background-color: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            padding: 8px 16px;
+            width: auto;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger);
+            color: #ffffff;
+            border-color: var(--danger);
+        }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+            background: #fef2f2;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        /* Dashboard View */
+        .dashboard-container {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-logo-icon {
+            width: 48px;
+            height: 48px;
+            background: #eff6ff;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid #dbeafe;
+        }
+
+        .header-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-org-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-org-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .header-org-dept {
+            font-size: 11px;
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .user-role {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .main-content {
+            padding: 24px;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            opacity: 0.8;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-card h3 {
+            font-size: 15px;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+
+        .tables-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .table-card h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            .header-right {
+                flex-direction: column;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header-org">
+                <div class="moe-logo-icon">🏛️</div>
+                <div class="login-org-title">وزارة التعليم</div>
+                <div class="login-org-sub">تعليمية شمال الشرقية</div>
+                <div class="login-org-dept">دائرة التقويم التربوي</div>
+            </div>
+
+            <h2>تسجيل الدخول - موجز</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>اسم المستخدم (الاسم الأول)</label>
+                    <input type="text" id="usernameInput" class="form-control" placeholder="أدخل اسمك الأول" required>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور (الرقم الوظيفي)</label>
+                    <input type="password" id="passwordInput" class="form-control" placeholder="أدخل الرقم الوظيفي" required>
+                </div>
+                <button type="submit" class="btn btn-primary">دخول النظام</button>
+                <div id="loginError" class="error-msg">بيانات الدخول غير صحيحة، أو غير مصرح لك بالنظام.</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardApp" class="dashboard-container">
+        <header>
+            <div class="header-right">
+                <div class="header-logo-icon">🏛️</div>
+                <div class="header-titles">
+                    <span class="header-org-title">وزارة التعليم</span>
+                    <span class="header-org-sub">تعليمية شمال الشرقية</span>
+                    <span class="header-org-dept">دائرة التقويم التربوي</span>
+                </div>
+            </div>
+
+            <div class="header-left">
+                <div class="user-info">
+                    <div id="currentUserName" class="user-name">اسم الأخصائي</div>
+                    <div id="currentUserJob" class="user-role">أخصائي تقويم</div>
+                </div>
+                <button class="btn btn-logout" onclick="showLogoutModal()">
+                    <span>🚪</span> خروج
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" id="totalVisits">0</div>
+                        <div class="stat-label">إجمالي الزيارات المسجلة</div>
+                    </div>
+                    <div class="stat-icon">📋</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" id="urgentVisits">0</div>
+                        <div class="stat-label">تتطلب متابعة عاجلة</div>
+                    </div>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" id="stableVisits">0</div>
+                        <div class="stat-label">زيارات مكتملة ومستقرة</div>
+                    </div>
+                    <div class="stat-icon">✅</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" id="totalStaff">0</div>
+                        <div class="stat-label">الموظفين المصرح لهم</div>
+                    </div>
+                    <div class="stat-icon">👥</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>📊 توزيع الزيارات الميدانية حسب القسم</h3>
+                    <canvas id="deptChart" height="200"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 حالة الزيارات والمتابعة</h3>
+                    <canvas id="statusChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Forms & Tables -->
+            <div class="tables-grid">
+                <div class="table-card">
+                    <h3>📝 تسجيل زيارة ميدانية جديدة</h3>
+                    <form id="visitForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>المدرسة</label>
+                                <input type="text" id="vSchool" class="form-control" placeholder="اسم المدرسة" required>
+                            </div>
+                            <div class="form-group">
+                                <label>المعلم / الموظف المعني</label>
+                                <input type="text" id="vTeacher" class="form-control" placeholder="اسم المعلم" required>
+                            </div>
+                            <div class="form-group">
+                                <label>التاريخ</label>
+                                <input type="date" id="vDate" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الحالة</label>
+                                <select id="vStatus" class="form-control">
+                                    <option value="مستقرة">مستقرة ومكتملة</option>
+                                    <option value="عاجلة">تتطلب متابعة عاجلة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>الملاحظات والتوصيات</label>
+                            <input type="text" id="vNotes" class="form-control" placeholder="أدخل تفاصيل التوصيات والملاحظات" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: auto;">حفظ الزيرة الميدانية</button>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <h3>📜 سجل الزيارات المسجلة</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الأخصائي</th>
+                                    <th>المدرسة</th>
+                                    <th>المعلم</th>
+                                    <th>التاريخ</th>
+                                    <th>الحالة</th>
+                                    <th>الملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Employees Management -->
+                <div class="table-card">
+                    <h3>➕ إضافة أخصائي / موظف مصرح له جديد</h3>
+                    <form id="employeeForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>الرقم الوظيفي (كلمة المرور)</label>
+                                <input type="text" id="empId" class="form-control" placeholder="مثال: 1005" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الاسم الكامل</label>
+                                <input type="text" id="empName" class="form-control" placeholder="الاسم الكامل (الأول سيكون المستخدم)" required>
+                            </div>
+                            <div class="form-group">
+                                <label>القسم</label>
+                                <input type="text" id="empDept" class="form-control" placeholder="قسم تقويم العلوم" required>
+                            </div>
+                            <div class="form-group">
+                                <label>المسمى الوظيفي</label>
+                                <input type="text" id="empRole" class="form-control" placeholder="أخصائي تقويم" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: auto;">إضافة للمستفيدين المصرح لهم</button>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>الاسم المستخدم (الاسم الأول)</th>
+                                    <th>الرقم الوظيفي (كلمة المرور)</th>
+                                    <th>الاسم الكامل</th>
+                                    <th>القسم</th>
+                                    <th>المسمى الوظيفي</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 12px; color: var(--text-dark);">تأكيد تسجيل الخروج</h3>
+            <p style="color: var(--text-muted); font-size: 14px;">هل أنت تأكد من رغبتك في الخروج من لوحة موجز؟</p>
+            <div class="modal-actions">
+                <button class="btn btn-logout" style="flex:1" onclick="logout()">نعم، خروج</button>
+                <button class="btn btn-primary" style="flex:1; background: #64748b;" onclick="hideLogoutModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial Mock Data
+        let employees = JSON.parse(localStorage.getItem('mojaz_staff')) || [
+            { id: '1001', name: 'يوسف المعمري', dept: 'تقويم العلوم', role: 'أخصائي تقويم أول' },
+            { id: '1002', name: 'أحمد الحارثي', dept: 'تقويم الرياضيات', role: 'أخصائي تقويم' },
+            { id: 'admin', name: 'مدير النظام', dept: 'إدارة دائرة التقويم', role: 'مشرف عام' }
+        ];
+
+        let visits = JSON.parse(localStorage.getItem('mojaz_visits')) || [
+            { specialist: 'يوسف المعمري', school: 'مدرسة المتنبي', teacher: 'سعيد', date: '2026-03-25', status: 'مستقرة', notes: 'أداء ممتاز واكتفاء بالخطة' },
+            { specialist: 'أحمد الحارثي', school: 'مدرسة المعالي', teacher: 'خالد', date: '2026-03-28', status: 'عاجلة', notes: 'يحتاج متابعة في أدوات التحصيل' }
+        ];
+
+        let currentUser = JSON.parse(localStorage.getItem('mojaz_user')) || null;
+        let deptChartInstance = null;
+        let statusChartInstance = null;
+
+        // Initialize App
+        window.onload = function() {
+            if (currentUser) {
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        };
+
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('usernameInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
+            const errorElement = document.getElementById('loginError');
+
+            const matchedUser = employees.find(emp => {
+                const firstName = emp.name.trim().split(' ')[0];
+                return (firstName.toLowerCase() === username.toLowerCase() || emp.name.toLowerCase() === username.toLowerCase()) && emp.id === password;
+            });
+
+            if (matchedUser) {
+                currentUser = matchedUser;
+                localStorage.setItem('mojaz_user', JSON.stringify(currentUser));
+                errorElement.style.display = 'none';
+                showDashboard();
+            } else {
+                errorElement.style.display = 'block';
+            }
+        });
+
+        function showLogin() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboardApp').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboardApp').style.display = 'flex';
+
+            document.getElementById('currentUserName').textContent = currentUser.name;
+            document.getElementById('currentUserJob').textContent = currentUser.role + ' - ' + currentUser.dept;
+
+            updateDashboardUI();
+        }
+
+        function showLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        function hideLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('mojaz_user');
+            currentUser = null;
+            hideLogoutModal();
+            showLogin();
+        }
+
+        // Add Visit Form
+        document.getElementById('visitForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newVisit = {
+                specialist: currentUser.name,
+                school: document.getElementById('vSchool').value,
+                teacher: document.getElementById('vTeacher').value,
+                date: document.getElementById('vDate').value,
+                status: document.getElementById('vStatus').value,
+                notes: document.getElementById('vNotes').value
+            };
+
+            visits.unshift(newVisit);
+            localStorage.setItem('mojaz_visits', JSON.stringify(visits));
+            this.reset();
+            updateDashboardUI();
+        });
+
+        // Add Employee Form
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newEmp = {
+                id: document.getElementById('empId').value.trim(),
+                name: document.getElementById('empName').value.trim(),
+                dept: document.getElementById('empDept').value.trim(),
+                role: document.getElementById('empRole').value.trim()
+            };
+
+            employees.push(newEmp);
+            localStorage.setItem('mojaz_staff', JSON.stringify(employees));
+            this.reset();
+            updateDashboardUI();
+        });
+
+        function updateDashboardUI() {
+            // Render Stats
+            document.getElementById('totalVisits').textContent = visits.length;
+            document.getElementById('urgentVisits').textContent = visits.filter(v => v.status === 'عاجلة').length;
+            document.getElementById('stableVisits').textContent = visits.filter(v => v.status === 'مستقرة').length;
+            document.getElementById('totalStaff').textContent = employees.length;
+
+            // Render Visit Table
+            const vTable = document.getElementById('visitsTableBody');
+            vTable.innerHTML = visits.map(v => `
+                <tr>
+                    <td><b>${v.specialist}</b></td>
+                    <td>${v.school}</td>
+                    <td>${v.teacher}</td>
+                    <td>${v.date}</td>
+                    <td><span class="badge ${v.status === 'عاجلة' ? 'badge-danger' : 'badge-success'}">${v.status}</span></td>
+                    <td>${v.notes}</td>
+                </tr>
+            `).join('');
+
+            // Render Employee Table
+            const eTable = document.getElementById('employeesTableBody');
+            eTable.innerHTML = employees.map(e => `
+                <tr>
+                    <td><code style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${e.name.split(' ')[0]}</code></td>
+                    <td><code>${e.id}</code></td>
+                    <td><b>${e.name}</b></td>
+                    <td>${e.dept}</td>
+                    <td>${e.role}</td>
+                </tr>
+            `).join('');
+
+            renderCharts();
+        }
+
+        function renderCharts() {
+            const depts = {};
+            visits.forEach(v => {
+                depts[v.school] = (depts[v.school] || 0) + 1;
+            });
+
+            const stableCount = visits.filter(v => v.status === 'مستقرة').length;
+            const urgentCount = visits.filter(v => v.status === 'عاجلة').length;
+
+            if (deptChartInstance) deptChartInstance.destroy();
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            const ctx1 = document.getElementById('deptChart').getContext('2d');
+            deptChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(depts).length ? Object.keys(depts) : ['لا توجد بيانات'],
+                    datasets: [{
+                        label: 'عدد الزيارات',
+                        data: Object.values(depts).length ? Object.values(depts) : [0],
+                        backgroundColor: '#1e3a8a'
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            const ctx2 = document.getElementById('statusChart').getContext('2d');
+            statusChartInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['مستقرة ومكتملة', 'متابعة عاجلة'],
+                    datasets: [{
+                        data: [stableCount, urgentCount],
+                        backgroundColor: ['#10b981', '#ef4444']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+    </script>
+</body>
+</html>dth=device-width, initial-scale=1.0">
     <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
     <!-- مكتبات خارجية -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
