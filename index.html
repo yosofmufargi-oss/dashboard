@@ -436,12 +436,12 @@
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label>اسم المستخدم</label>
-                    <input type="text" id="usernameInput" class="form-control" placeholder="أدخل اسم المستخدم" required>
+                    <label>اسم المستخدم (الاسم الأول)</label>
+                    <input type="text" id="usernameInput" class="form-control" placeholder="أدخل اسمك الأول" required>
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
-                    <input type="password" id="passwordInput" class="form-control" placeholder="أدخل كلمة المرور" required>
+                    <label>كلمة المرور (الرقم الوظيفي)</label>
+                    <input type="password" id="passwordInput" class="form-control" placeholder="أدخل الرقم الوظيفي" required>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول النظام</button>
                 <div id="loginError" class="error-msg">بيانات الدخول غير صحيحة، أو غير مصرح لك بالنظام.</div>
@@ -463,8 +463,8 @@
 
             <div class="header-left">
                 <div class="user-info">
-                    <div id="currentUserName" class="user-name">مدير النظام</div>
-                    <div id="currentUserJob" class="user-role">مشرف عام</div>
+                    <div id="currentUserName" class="user-name">اسم الأخصائي</div>
+                    <div id="currentUserJob" class="user-role">أخصائي تقويم</div>
                 </div>
                 <button class="btn btn-logout" onclick="showLogoutModal()">
                     <span>🚪</span> خروج
@@ -581,7 +581,7 @@
                             </div>
                             <div class="form-group">
                                 <label>الاسم الكامل</label>
-                                <input type="text" id="empName" class="form-control" placeholder="الاسم الكامل" required>
+                                <input type="text" id="empName" class="form-control" placeholder="الاسم الكامل (الأول سيكون اسم المستخدم)" required>
                             </div>
                             <div class="form-group">
                                 <label>القسم</label>
@@ -602,8 +602,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>اسم المستخدم</th>
-                                    <th>كلمة المرور</th>
+                                    <th>اسم المستخدم (الاسم الأول)</th>
+                                    <th>الرقم الوظيفي (كلمة المرور)</th>
                                     <th>الاسم الكامل</th>
                                     <th>القسم</th>
                                     <th>المسمى الوظيفي</th>
@@ -631,17 +631,32 @@
     </div>
 
     <script>
-        // Only admin is authorized by default
+        // Helper function to normalize Arabic text (remove alef hamzas)
+        function normalizeArabic(text) {
+            if (!text) return '';
+            return text.trim()
+                .replace(/[أإآ]/g, 'ا')
+                .replace(/ة/g, 'ه')
+                .toLowerCase();
+        }
+
+        // Default Staff Data
         const defaultEmployees = [
+            { id: '1001', name: 'يوسف المعمري', dept: 'تقويم العلوم', role: 'أخصائي تقويم أول' },
+            { id: '1002', name: 'أحمد الحارثي', dept: 'تقويم الرياضيات', role: 'أخصائي تقويم' },
             { id: 'admin', name: 'مدير النظام', dept: 'إدارة دائرة التقويم', role: 'مشرف عام' }
         ];
 
-        // Force update localStorage to remove previous staff
-        localStorage.setItem('mojaz_staff', JSON.stringify(defaultEmployees));
-        let employees = defaultEmployees;
+        // Safe Loading of LocalStorage Data
+        let employees = JSON.parse(localStorage.getItem('mojaz_staff'));
+        if (!employees || employees.length === 0 || !employees[0].id) {
+            employees = defaultEmployees;
+            localStorage.setItem('mojaz_staff', JSON.stringify(employees));
+        }
 
         let visits = JSON.parse(localStorage.getItem('mojaz_visits')) || [
-            { specialist: 'مدير النظام', school: 'مدرسة المتنبي', teacher: 'سعيد', date: '2026-03-25', status: 'مستقرة', notes: 'أداء ممتاز واكتفاء بالخطة' }
+            { specialist: 'يوسف المعمري', school: 'مدرسة المتنبي', teacher: 'سعيد', date: '2026-03-25', status: 'مستقرة', notes: 'أداء ممتاز واكتفاء بالخطة' },
+            { specialist: 'أحمد الحارثي', school: 'مدرسة المعالي', teacher: 'خالد', date: '2026-03-28', status: 'عاجلة', notes: 'يحتاج متابعة في أدوات التحصيل' }
         ];
 
         let currentUser = JSON.parse(localStorage.getItem('mojaz_user')) || null;
@@ -650,10 +665,9 @@
 
         // Initialize App
         window.onload = function() {
-            if (currentUser && currentUser.id === 'admin') {
+            if (currentUser) {
                 showDashboard();
             } else {
-                localStorage.removeItem('mojaz_user');
                 showLogin();
             }
         };
@@ -661,12 +675,21 @@
         // Login Logic
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const username = document.getElementById('usernameInput').value.trim();
+            const rawUsername = document.getElementById('usernameInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
             const errorElement = document.getElementById('loginError');
 
+            const normalizedInput = normalizeArabic(rawUsername);
+
             const matchedUser = employees.find(emp => {
-                return (username.toLowerCase() === 'admin' || emp.name.toLowerCase() === username.toLowerCase()) && emp.id === password;
+                const firstName = emp.name.trim().split(' ')[0];
+                const normFirstName = normalizeArabic(firstName);
+                const normFullName = normalizeArabic(emp.name);
+                
+                const isUserMatch = (normFirstName === normalizedInput || normFullName === normalizedInput);
+                const isPassMatch = (emp.id === password);
+
+                return isUserMatch && isPassMatch;
             });
 
             if (matchedUser) {
@@ -767,7 +790,7 @@
             const eTable = document.getElementById('employeesTableBody');
             eTable.innerHTML = employees.map(e => `
                 <tr>
-                    <td><code style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${e.id === 'admin' ? 'admin' : e.name.split(' ')[0]}</code></td>
+                    <td><code style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${e.name.split(' ')[0]}</code></td>
                     <td><code>${e.id}</code></td>
                     <td><b>${e.name}</b></td>
                     <td>${e.dept}</td>
