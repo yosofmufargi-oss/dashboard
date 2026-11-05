@@ -264,7 +264,7 @@
             font-size: 11px;
         }
 
-        /* 🎨 3D Colored Navigation Tabs (Permanently Colored) */
+        /* 🎨 3D Colored Navigation Tabs */
         .nav-bar {
             background: #ffffff;
             border-bottom: 2px solid var(--border);
@@ -292,7 +292,6 @@
             top: 0;
         }
 
-        /* Permanent Color Definitions with 3D Depths */
         .nav-tab[data-target="sec-stats"] {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             border: 1px solid #1d4ed8;
@@ -323,13 +322,11 @@
             box-shadow: 0 5px 0 #075985, 0 6px 12px rgba(56, 189, 248, 0.3);
         }
 
-        /* Hover Behavior */
         .nav-tab:hover {
             transform: translateY(-2px);
             filter: brightness(1.1);
         }
 
-        /* Active Pressed Down 3D State */
         .nav-tab.active {
             top: 4px;
             filter: brightness(1.15);
@@ -365,7 +362,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Live Status Strip */
         .live-pulse-strip {
             background: #ffffff;
             border-radius: 12px;
@@ -403,7 +399,6 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -673,7 +668,6 @@
             <!-- Section 1: Infographics & Live Pulse Stats -->
             <div id="sec-stats" class="tab-section active">
                 
-                <!-- Live Pulse Status Strip -->
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
@@ -684,7 +678,6 @@
                     </div>
                 </div>
 
-                <!-- Infographic Cards Grid -->
                 <div class="stats-grid">
                     <div class="stat-card blue">
                         <div class="stat-head">
@@ -731,7 +724,6 @@
                     </div>
                 </div>
 
-                <!-- Interactive Charts -->
                 <div class="charts-grid">
                     <div class="chart-card">
                         <h3>📊 توزيع الزيارات الميدانية حسب المدرسة</h3>
@@ -750,6 +742,12 @@
                     <h3>📝 تسجيل زيارة ميدانية جديدة</h3>
                     <form id="visitForm">
                         <div class="form-grid">
+                            <div class="form-group">
+                                <label>الأخصائي الزائر</label>
+                                <select id="vSpecialist" class="form-control" required>
+                                    <!-- Options populated dynamically from Javascript -->
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label>المدرسة</label>
                                 <input type="text" id="vSchool" class="form-control" placeholder="اسم المدرسة" required>
@@ -911,6 +909,14 @@
             }
         };
 
+        function populateSpecialistsDropdown() {
+            const specSelect = document.getElementById('vSpecialist');
+            specSelect.innerHTML = employees.map(emp => {
+                const isSelected = currentUser && currentUser.id === emp.id ? 'selected' : '';
+                return `<option value="${emp.name}" ${isSelected}>${emp.name}</option>`;
+            }).join('');
+        }
+
         function switchTab(targetId, tabElement) {
             document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
@@ -960,6 +966,7 @@
             document.getElementById('currentUserName').textContent = currentUser.name;
             document.getElementById('currentUserJob').textContent = currentUser.role + ' - ' + currentUser.dept;
 
+            populateSpecialistsDropdown();
             updateDashboardUI();
         }
 
@@ -981,7 +988,7 @@
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const newVisit = {
-                specialist: currentUser.name,
+                specialist: document.getElementById('vSpecialist').value,
                 school: document.getElementById('vSchool').value,
                 teacher: document.getElementById('vTeacher').value,
                 date: document.getElementById('vDate').value,
@@ -992,6 +999,7 @@
             visits.unshift(newVisit);
             localStorage.setItem('mojaz_visits', JSON.stringify(visits));
             this.reset();
+            populateSpecialistsDropdown();
             updateDashboardUI();
             
             const visitsTab = document.querySelector('.nav-tab[data-target="sec-visits-log"]');
@@ -1010,6 +1018,7 @@
             employees.push(newEmp);
             localStorage.setItem('mojaz_staff', JSON.stringify(employees));
             this.reset();
+            populateSpecialistsDropdown();
             updateDashboardUI();
 
             const empTab = document.querySelector('.nav-tab[data-target="sec-emp-list"]');
@@ -1026,7 +1035,6 @@
             document.getElementById('stableVisits').textContent = stableV;
             document.getElementById('totalStaff').textContent = employees.length;
 
-            // Infographic Progress Bars Calculation
             if (totalV > 0) {
                 document.getElementById('pUrgentVisits').style.width = Math.round((urgentV / totalV) * 100) + '%';
                 document.getElementById('pStableVisits').style.width = Math.round((stableV / totalV) * 100) + '%';
@@ -1035,7 +1043,6 @@
                 document.getElementById('pStableVisits').style.width = '0%';
             }
 
-            // Render Visit Table
             const vTable = document.getElementById('visitsTableBody');
             if (visits.length === 0) {
                 vTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">لا توجد زيارات مسجلة حالياً</td></tr>`;
@@ -1052,7 +1059,6 @@
                 `).join('');
             }
 
-            // Render Employee Table
             const eTable = document.getElementById('employeesTableBody');
             eTable.innerHTML = employees.map(e => `
                 <tr>
