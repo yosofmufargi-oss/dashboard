@@ -264,13 +264,13 @@
             font-size: 11px;
         }
 
-        /* 🚀 3D Interactive Top Navigation Bar */
+        /* 🎨 3D Colored Navigation Tabs (Permanently Colored) */
         .nav-bar {
             background: #ffffff;
             border-bottom: 2px solid var(--border);
             display: flex;
             gap: 14px;
-            padding: 14px 28px;
+            padding: 16px 28px;
             overflow-x: auto;
             box-shadow: inset 0 -2px 5px rgba(0,0,0,0.03);
         }
@@ -282,64 +282,66 @@
             padding: 12px 22px;
             border-radius: 12px;
             font-size: 14px;
-            font-weight: 700;
-            color: #475569;
-            background: #f8fafc;
+            font-weight: 800;
+            color: #ffffff;
             cursor: pointer;
             white-space: nowrap;
             user-select: none;
-            
-            /* 3D Visual Styling */
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 0 #cbd5e1, 0 6px 12px rgba(0,0,0,0.08);
-            transition: all 0.15s ease-in-out;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             top: 0;
         }
 
+        /* Permanent Color Definitions with 3D Depths */
+        .nav-tab[data-target="sec-stats"] {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            border: 1px solid #1d4ed8;
+            box-shadow: 0 5px 0 #1e293b, 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-tab[data-target="sec-add-visit"] {
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            border: 1px solid #0f766e;
+            box-shadow: 0 5px 0 #115e59, 0 6px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .nav-tab[data-target="sec-visits-log"] {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            border: 1px solid #b45309;
+            box-shadow: 0 5px 0 #78350f, 0 6px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .nav-tab[data-target="sec-add-emp"] {
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            border: 1px solid #5b21b6;
+            box-shadow: 0 5px 0 #4c1d95, 0 6px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-tab[data-target="sec-emp-list"] {
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            border: 1px solid #0369a1;
+            box-shadow: 0 5px 0 #075985, 0 6px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Hover Behavior */
         .nav-tab:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 0 #cbd5e1, 0 8px 15px rgba(0,0,0,0.12);
-            background: #ffffff;
-            color: var(--primary);
+            filter: brightness(1.1);
         }
 
-        .nav-tab:active {
-            top: 3px;
-            box-shadow: 0 1px 0 #cbd5e1, 0 2px 4px rgba(0,0,0,0.1);
+        /* Active Pressed Down 3D State */
+        .nav-tab.active {
+            top: 4px;
+            filter: brightness(1.15);
+            outline: 2px solid #ffffff;
+            outline-offset: -4px;
         }
 
-        /* Active 3D Glowing Tabs with Individual Color Identities */
-        .nav-tab[data-target="sec-stats"].active {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: #ffffff;
-            border-color: #1e3a8a;
-            box-shadow: 0 4px 0 #1e293b, 0 6px 15px rgba(37, 99, 235, 0.4);
-        }
-        .nav-tab[data-target="sec-add-visit"].active {
-            background: linear-gradient(135deg, #0d9488, #14b8a6);
-            color: #ffffff;
-            border-color: #0f766e;
-            box-shadow: 0 4px 0 #115e59, 0 6px 15px rgba(20, 184, 166, 0.4);
-        }
-        .nav-tab[data-target="sec-visits-log"].active {
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-            color: #ffffff;
-            border-color: #b45309;
-            box-shadow: 0 4px 0 #78350f, 0 6px 15px rgba(245, 158, 11, 0.4);
-        }
-        .nav-tab[data-target="sec-add-emp"].active {
-            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
-            color: #ffffff;
-            border-color: #5b21b6;
-            box-shadow: 0 4px 0 #4c1d95, 0 6px 15px rgba(139, 92, 246, 0.4);
-        }
-        .nav-tab[data-target="sec-emp-list"].active {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: #ffffff;
-            border-color: #1d4ed8;
-            box-shadow: 0 4px 0 #1e40af, 0 6px 15px rgba(59, 130, 246, 0.4);
-        }
+        .nav-tab[data-target="sec-stats"].active { box-shadow: 0 1px 0 #1e293b, 0 2px 8px rgba(37, 99, 235, 0.5); }
+        .nav-tab[data-target="sec-add-visit"].active { box-shadow: 0 1px 0 #115e59, 0 2px 8px rgba(20, 184, 166, 0.5); }
+        .nav-tab[data-target="sec-visits-log"].active { box-shadow: 0 1px 0 #78350f, 0 2px 8px rgba(245, 158, 11, 0.5); }
+        .nav-tab[data-target="sec-add-emp"].active { box-shadow: 0 1px 0 #4c1d95, 0 2px 8px rgba(139, 92, 246, 0.5); }
+        .nav-tab[data-target="sec-emp-list"].active { box-shadow: 0 1px 0 #075985, 0 2px 8px rgba(56, 189, 248, 0.5); }
 
         .main-content {
             padding: 28px;
@@ -363,7 +365,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 📊 Infographic & Pulse Status Strip */
+        /* Live Status Strip */
         .live-pulse-strip {
             background: #ffffff;
             border-radius: 12px;
@@ -401,7 +403,7 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        /* Stats Infographic Grid */
+        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -462,7 +464,6 @@
             background: #f8fafc;
         }
 
-        /* Infographic Progress Bars */
         .progress-bar-bg {
             width: 100%;
             height: 6px;
@@ -648,7 +649,7 @@
             </div>
         </header>
 
-        <!-- 🚀 3D Interactive Navigation Bar -->
+        <!-- 🎨 3D Colored Navigation Tabs -->
         <nav class="nav-bar">
             <div class="nav-tab active" data-target="sec-stats" onclick="switchTab('sec-stats', this)">
                 <span>📊</span> الإحصائيات العامة
