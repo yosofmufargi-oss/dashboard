@@ -260,12 +260,80 @@
             font-size: 11px;
         }
 
+        /* Top Interactive Navigation Bar */
+        .nav-bar {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            gap: 10px;
+            padding: 10px 24px;
+            overflow-x: auto;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        /* Tab Specific Colors on Active */
+        .nav-tab[data-target="sec-stats"].active {
+            background: #1e3a8a;
+            color: #ffffff;
+        }
+        .nav-tab[data-target="sec-add-visit"].active {
+            background: #0d9488;
+            color: #ffffff;
+        }
+        .nav-tab[data-target="sec-visits-log"].active {
+            background: #d97706;
+            color: #ffffff;
+        }
+        .nav-tab[data-target="sec-add-emp"].active {
+            background: #7c3aed;
+            color: #ffffff;
+        }
+        .nav-tab[data-target="sec-emp-list"].active {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
         .main-content {
             padding: 24px;
             flex: 1;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
+        }
+
+        .tab-section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .tab-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .stats-grid {
@@ -322,18 +390,13 @@
             color: var(--text-dark);
         }
 
-        .tables-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-        }
-
         .table-card {
             background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border);
             padding: 20px;
             overflow: hidden;
+            margin-bottom: 24px;
         }
 
         .table-card h3 {
@@ -436,12 +499,12 @@
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label>اسم المستخدم (الاسم الأول)</label>
-                    <input type="text" id="usernameInput" class="form-control" placeholder="أدخل اسمك الأول" required>
+                    <label>اسم المستخدم (admin / الاسم الأول)</label>
+                    <input type="text" id="usernameInput" class="form-control" placeholder="أدخل admin أو الاسم الأول" required>
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور (الرقم الوظيفي)</label>
-                    <input type="password" id="passwordInput" class="form-control" placeholder="أدخل الرقم الوظيفي" required>
+                    <label>كلمة المرور (admin / الرقم الوظيفي)</label>
+                    <input type="password" id="passwordInput" class="form-control" placeholder="أدخل كلمة المرور أو الرقم الوظيفي" required>
                 </div>
                 <button type="submit" class="btn btn-primary">دخول النظام</button>
                 <div id="loginError" class="error-msg">بيانات الدخول غير صحيحة، أو غير مصرح لك بالنظام.</div>
@@ -472,53 +535,74 @@
             </div>
         </header>
 
+        <!-- Top Navigation Bar -->
+        <nav class="nav-bar">
+            <div class="nav-tab active" data-target="sec-stats" onclick="switchTab('sec-stats', this)">
+                <span>📊</span> الإحصائيات العامة
+            </div>
+            <div class="nav-tab" data-target="sec-add-visit" onclick="switchTab('sec-add-visit', this)">
+                <span>📝</span> تسجيل زيارة جديد
+            </div>
+            <div class="nav-tab" data-target="sec-visits-log" onclick="switchTab('sec-visits-log', this)">
+                <span>📜</span> سجل الزيارات
+            </div>
+            <div class="nav-tab" data-target="sec-add-emp" onclick="switchTab('sec-add-emp', this)">
+                <span>➕</span> إضافة أخصائي جديد
+            </div>
+            <div class="nav-tab" data-target="sec-emp-list" onclick="switchTab('sec-emp-list', this)">
+                <span>👥</span> بيانات الموظفين
+            </div>
+        </nav>
+
         <div class="main-content">
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-val" id="totalVisits">0</div>
-                        <div class="stat-label">إجمالي الزيارات المسجلة</div>
+
+            <!-- Section 1: Dashboard Stats & Charts -->
+            <div id="sec-stats" class="tab-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-val" id="totalVisits">0</div>
+                            <div class="stat-label">إجمالي الزيارات المسجلة</div>
+                        </div>
+                        <div class="stat-icon">📋</div>
                     </div>
-                    <div class="stat-icon">📋</div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-val" id="urgentVisits">0</div>
+                            <div class="stat-label">تتطلب متابعة عاجلة</div>
+                        </div>
+                        <div class="stat-icon">⚠️</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-val" id="stableVisits">0</div>
+                            <div class="stat-label">زيارات مكتملة ومستقرة</div>
+                        </div>
+                        <div class="stat-icon">✅</div>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-val" id="totalStaff">0</div>
+                            <div class="stat-label">الموظفين المصرح لهم</div>
+                        </div>
+                        <div class="stat-icon">👥</div>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-val" id="urgentVisits">0</div>
-                        <div class="stat-label">تتطلب متابعة عاجلة</div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>📊 توزيع الزيارات الميدانية حسب المدرسة</h3>
+                        <canvas id="deptChart" height="200"></canvas>
                     </div>
-                    <div class="stat-icon">⚠️</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-val" id="stableVisits">0</div>
-                        <div class="stat-label">زيارات مكتملة ومستقرة</div>
+                    <div class="chart-card">
+                        <h3>🎯 حالة الزيارات والمتابعة</h3>
+                        <canvas id="statusChart" height="200"></canvas>
                     </div>
-                    <div class="stat-icon">✅</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-val" id="totalStaff">0</div>
-                        <div class="stat-label">الموظفين المصرح لهم</div>
-                    </div>
-                    <div class="stat-icon">👥</div>
                 </div>
             </div>
 
-            <!-- Charts -->
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <h3>📊 توزيع الزيارات الميدانية حسب المدرسة</h3>
-                    <canvas id="deptChart" height="200"></canvas>
-                </div>
-                <div class="chart-card">
-                    <h3>🎯 حالة الزيارات والمتابعة</h3>
-                    <canvas id="statusChart" height="200"></canvas>
-                </div>
-            </div>
-
-            <!-- Forms & Tables -->
-            <div class="tables-grid">
+            <!-- Section 2: Add Visit -->
+            <div id="sec-add-visit" class="tab-section">
                 <div class="table-card">
                     <h3>📝 تسجيل زيارة ميدانية جديدة</h3>
                     <form id="visitForm">
@@ -550,7 +634,10 @@
                         <button type="submit" class="btn btn-primary" style="width: auto;">حفظ الزيارة الميدانية</button>
                     </form>
                 </div>
+            </div>
 
+            <!-- Section 3: Visits Log -->
+            <div id="sec-visits-log" class="tab-section">
                 <div class="table-card">
                     <h3>📜 سجل الزيارات المسجلة</h3>
                     <div style="overflow-x: auto;">
@@ -569,33 +656,38 @@
                         </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- Employees Management -->
+            <!-- Section 4: Add Employee -->
+            <div id="sec-add-emp" class="tab-section">
                 <div class="table-card">
                     <h3>➕ إضافة أخصائي / موظف مصرح له جديد</h3>
                     <form id="employeeForm">
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>الرقم الوظيفي (كلمة المرور)</label>
-                                <input type="text" id="empId" class="form-control" placeholder="مثال: 1005" required>
+                                <input type="text" id="empId" class="form-control" placeholder="مثال: 1686553" required>
                             </div>
                             <div class="form-group">
                                 <label>الاسم الكامل</label>
-                                <input type="text" id="empName" class="form-control" placeholder="الاسم الكامل (الأول سيكون اسم المستخدم)" required>
+                                <input type="text" id="empName" class="form-control" placeholder="الاسم الكامل" required>
                             </div>
                             <div class="form-group">
                                 <label>القسم</label>
-                                <input type="text" id="empDept" class="form-control" placeholder="قسم تقويم العلوم" required>
+                                <input type="text" id="empDept" class="form-control" placeholder="قسم تقويم تعلم..." required>
                             </div>
                             <div class="form-group">
                                 <label>المسمى الوظيفي</label>
-                                <input type="text" id="empRole" class="form-control" placeholder="أخصائي تقويم" required>
+                                <input type="text" id="empRole" class="form-control" placeholder="أخصائي تقويم..." required>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: auto;">إضافة للمستفيدين المصرح لهم</button>
                     </form>
                 </div>
+            </div>
 
+            <!-- Section 5: Employee List -->
+            <div id="sec-emp-list" class="tab-section">
                 <div class="table-card">
                     <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</h3>
                     <div style="overflow-x: auto;">
@@ -613,8 +705,8 @@
                         </table>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
 
@@ -631,7 +723,7 @@
     </div>
 
     <script>
-        // Helper function to normalize Arabic text (remove alef hamzas)
+        // Helper function to normalize Arabic text
         function normalizeArabic(text) {
             if (!text) return '';
             return text.trim()
@@ -640,24 +732,38 @@
                 .toLowerCase();
         }
 
-        // Default Staff Data
+        // Complete Official Staff List extracted from attached PDFs
         const defaultEmployees = [
-            { id: '1001', name: 'يوسف المعمري', dept: 'تقويم العلوم', role: 'أخصائي تقويم أول' },
-            { id: '1002', name: 'أحمد الحارثي', dept: 'تقويم الرياضيات', role: 'أخصائي تقويم' },
-            { id: 'admin', name: 'مدير النظام', dept: 'إدارة دائرة التقويم', role: 'مشرف عام' }
+            // Admin Account
+            { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
+            
+            // Applied Science Department
+            { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
+            { id: '16128287', name: 'فاطمه سالم هدوب معيوف المغيرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مادة الفيزياء أول' },
+            { id: '16119223', name: 'نصراء بنت مبارك بن سلطان', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة تقنية المعلومات أول' },
+            { id: '16128341', name: 'وليد بن مالك بن محمد الجهضمي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الأحياء أول' },
+            { id: '16177726', name: 'أفراح بنت مبارك بن ناجم الحجرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مجال ثان' },
+            { id: '1682354', name: 'علي بن صابح بن سالم بني عرابه', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات أول' },
+
+            // Humanities & Individual Skills Department
+            { id: '1696508', name: 'يوسف بن سليمان بن سالم المفرجي', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'رئيس قسم' },
+            { id: '16143371', name: 'سلطان محمد ناصر حمد الحارثي', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة الرياضة المدرسية ثان' },
+            { id: '16125123', name: 'رحمه محمد خالد علي المسكرية', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة اللغة الإنجليزية ثان' },
+            { id: '1686518', name: 'زبانه راشد محمد راشد البوسعيدية', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة التاريخ أول' },
+            { id: '1686654', name: 'اسماء حمود ناصر حمود السناوية', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة اللغة العربية أول' },
+            { id: '16142588', name: 'راشد بن محمد بن سالم الحارثي', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة جغرافيا ثاني' },
+            { id: '16143513', name: 'نسرین بنت حمد سيف الرواحية', dept: 'قسم تعلم مواد العلوم الانسانيه والمهارات الفرديه', role: 'اخصائي تقويم مجال أول / ٢' },
+            { id: '16175869', name: 'وردة بنت مبروك سويدان الحجرية', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'اخصائي تقويم فنون تشكيلية / ٤' },
+            { id: '1686397', name: 'محمد بن سالم بن محمد اليزيدي', dept: 'قسم تعلم مواد العلوم الانسانية والمهارات الفرديه', role: 'أخصائي تقويم مادة التربية الإسلامية أول' },
+            { id: '1694487', name: 'سالم بن حميد بن سالم الحارثي', dept: 'قسم تعلم مواد العلوم الانسانيه والمهارات الفرديه', role: 'أخصائي تقويم مادة التربية الإسلامية' }
         ];
 
-        // Safe Loading of LocalStorage Data
-        let employees = JSON.parse(localStorage.getItem('mojaz_staff'));
-        if (!employees || employees.length === 0 || !employees[0].id) {
-            employees = defaultEmployees;
-            localStorage.setItem('mojaz_staff', JSON.stringify(employees));
-        }
+        // Always reload freshly extracted list
+        let employees = defaultEmployees;
+        localStorage.setItem('mojaz_staff', JSON.stringify(employees));
 
-        let visits = JSON.parse(localStorage.getItem('mojaz_visits')) || [
-            { specialist: 'يوسف المعمري', school: 'مدرسة المتنبي', teacher: 'سعيد', date: '2026-03-25', status: 'مستقرة', notes: 'أداء ممتاز واكتفاء بالخطة' },
-            { specialist: 'أحمد الحارثي', school: 'مدرسة المعالي', teacher: 'خالد', date: '2026-03-28', status: 'عاجلة', notes: 'يحتاج متابعة في أدوات التحصيل' }
-        ];
+        // Visits Data (Empty initially as requested)
+        let visits = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
 
         let currentUser = JSON.parse(localStorage.getItem('mojaz_user')) || null;
         let deptChartInstance = null;
@@ -671,6 +777,15 @@
                 showLogin();
             }
         };
+
+        // Tab Switching Logic
+        function switchTab(targetId, tabElement) {
+            document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(targetId).classList.add('active');
+            tabElement.classList.add('active');
+        }
 
         // Login Logic
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -748,6 +863,10 @@
             localStorage.setItem('mojaz_visits', JSON.stringify(visits));
             this.reset();
             updateDashboardUI();
+            
+            // Auto switch to visits log tab
+            const visitsTab = document.querySelector('.nav-tab[data-target="sec-visits-log"]');
+            switchTab('sec-visits-log', visitsTab);
         });
 
         // Add Employee Form
@@ -764,6 +883,10 @@
             localStorage.setItem('mojaz_staff', JSON.stringify(employees));
             this.reset();
             updateDashboardUI();
+
+            // Auto switch to staff list tab
+            const empTab = document.querySelector('.nav-tab[data-target="sec-emp-list"]');
+            switchTab('sec-emp-list', empTab);
         });
 
         function updateDashboardUI() {
@@ -775,22 +898,26 @@
 
             // Render Visit Table
             const vTable = document.getElementById('visitsTableBody');
-            vTable.innerHTML = visits.map(v => `
-                <tr>
-                    <td><b>${v.specialist}</b></td>
-                    <td>${v.school}</td>
-                    <td>${v.teacher}</td>
-                    <td>${v.date}</td>
-                    <td><span class="badge ${v.status === 'عاجلة' ? 'badge-danger' : 'badge-success'}">${v.status}</span></td>
-                    <td>${v.notes}</td>
-                </tr>
-            `).join('');
+            if (visits.length === 0) {
+                vTable.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--text-muted);">لا توجد زيارات مسجلة حالياً</td></tr>`;
+            } else {
+                vTable.innerHTML = visits.map(v => `
+                    <tr>
+                        <td><b>${v.specialist}</b></td>
+                        <td>${v.school}</td>
+                        <td>${v.teacher}</td>
+                        <td>${v.date}</td>
+                        <td><span class="badge ${v.status === 'عاجلة' ? 'badge-danger' : 'badge-success'}">${v.status}</span></td>
+                        <td>${v.notes}</td>
+                    </tr>
+                `).join('');
+            }
 
             // Render Employee Table
             const eTable = document.getElementById('employeesTableBody');
             eTable.innerHTML = employees.map(e => `
                 <tr>
-                    <td><code style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px;">${e.name.split(' ')[0]}</code></td>
+                    <td><code style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:6px; font-weight:bold;">${e.name.split(' ')[0]}</code></td>
                     <td><code>${e.id}</code></td>
                     <td><b>${e.name}</b></td>
                     <td>${e.dept}</td>
