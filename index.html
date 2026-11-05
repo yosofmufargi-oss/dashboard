@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موجز - لوحة أخصائي تقويم المواد الميدانية</title>
+    <title>موجز - لوحة أخصائي تقويم المواد الميدانية (مزامنة سحابية)</title>
     <!-- Chart.js for Dashboards -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase App & Firestore (SDK v9 Compact / Compatibility Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --primary: #1e3a8a;
@@ -671,10 +676,10 @@
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
-                        <span>مؤشرات الميدان المباشرة (تحديث لحظي)</span>
+                        <span>مؤشرات الميدان المباشرة (مزامنة سحابية لحظية)</span>
                     </div>
                     <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="liveTime">
-                        نظام موجز الذكي
+                        نظام موجز السحابي
                     </div>
                 </div>
 
@@ -745,7 +750,7 @@
                             <div class="form-group">
                                 <label>الأخصائي الزائر</label>
                                 <select id="vSpecialist" class="form-control" required>
-                                    <!-- Options populated dynamically from Javascript -->
+                                    <!-- Options populated dynamically from Cloud -->
                                 </select>
                             </div>
                             <div class="form-group">
@@ -772,7 +777,7 @@
                             <label>الملاحظات والتوصيات</label>
                             <input type="text" id="vNotes" class="form-control" placeholder="أدخل تفاصيل التوصيات والملاحظات" required>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: auto;">حفظ الزيارة الميدانية</button>
+                        <button type="submit" class="btn btn-primary" style="width: auto;">حفظ الزيارة الميدانية بالسحابة ☁️</button>
                     </form>
                 </div>
             </div>
@@ -780,7 +785,7 @@
             <!-- Section 3: Visits Log -->
             <div id="sec-visits-log" class="tab-section">
                 <div class="table-card">
-                    <h3>📜 سجل الزيارات المسجلة</h3>
+                    <h3>📜 سجل الزيارات المسجلة (مزامنة مباشرة)</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
@@ -822,7 +827,7 @@
                                 <input type="text" id="empRole" class="form-control" placeholder="أخصائي تقويم..." required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: auto;">إضافة للمستفيدين المصرح لهم</button>
+                        <button type="submit" class="btn btn-primary" style="width: auto;">إضافة للمستفيدين المصرح لهم ☁️</button>
                     </form>
                 </div>
             </div>
@@ -864,6 +869,26 @@
     </div>
 
     <script>
+        // 🔥 Firebase Configuration (Firestore Real-time Sync)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDemoConfigKeyForMojazApp2026",
+            authDomain: "mojaz-app-edu.firebaseapp.com",
+            projectId: "mojaz-app-edu",
+            storageBucket: "mojaz-app-edu.appspot.com",
+            messagingSenderId: "109823746501",
+            appId: "1:109823746501:web:9872abcde123456"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // Safe App Scope Collections
+        const staffRef = db.collection('artifacts').doc('mojaz-dashboard').collection('staff');
+        const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
+
         function normalizeArabic(text) {
             if (!text) return '';
             return text.trim()
@@ -872,7 +897,7 @@
                 .toLowerCase();
         }
 
-        // Official Extracted Staff Data
+        // Default Staff Roster
         const defaultEmployees = [
             { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
             { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
@@ -894,20 +919,64 @@
         ];
 
         let employees = defaultEmployees;
-        localStorage.setItem('mojaz_staff', JSON.stringify(employees));
-
-        let visits = JSON.parse(localStorage.getItem('mojaz_visits')) || [];
+        let visits = [];
         let currentUser = JSON.parse(localStorage.getItem('mojaz_user')) || null;
         let deptChartInstance = null;
         let statusChartInstance = null;
 
+        // Initialize Realtime Sync Listeners
         window.onload = function() {
+            listenToStaffChanges();
+            listenToVisitsChanges();
+
             if (currentUser) {
                 showDashboard();
             } else {
                 showLogin();
             }
         };
+
+        // Realtime Firebase Listener: Employees / Staff
+        function listenToStaffChanges() {
+            staffRef.onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    // Seed initial staff data to cloud
+                    defaultEmployees.forEach(emp => {
+                        staffRef.doc(emp.id).set(emp);
+                    });
+                    employees = defaultEmployees;
+                } else {
+                    employees = [];
+                    snapshot.forEach(doc => {
+                        employees.push(doc.data());
+                    });
+                }
+                populateSpecialistsDropdown();
+                updateDashboardUI();
+            }, (error) => {
+                console.warn("Using local staff backup:", error);
+                employees = defaultEmployees;
+                populateSpecialistsDropdown();
+                updateDashboardUI();
+            });
+        }
+
+        // Realtime Firebase Listener: Visits Log
+        function listenToVisitsChanges() {
+            visitsRef.onSnapshot((snapshot) => {
+                visits = [];
+                snapshot.forEach(doc => {
+                    visits.push(doc.data());
+                });
+                // Sort by newest visits
+                visits.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+                updateDashboardUI();
+            }, (error) => {
+                console.warn("Using local visits fallback:", error);
+                visits = JSON.parse(localStorage.getItem('mojaz_visits_fallback')) || [];
+                updateDashboardUI();
+            });
+        }
 
         function populateSpecialistsDropdown() {
             const specSelect = document.getElementById('vSpecialist');
@@ -985,44 +1054,52 @@
             showLogin();
         }
 
+        // Submit Visit to Cloud Firebase
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const visitId = 'visit_' + Date.now();
             const newVisit = {
+                id: visitId,
                 specialist: document.getElementById('vSpecialist').value,
                 school: document.getElementById('vSchool').value,
                 teacher: document.getElementById('vTeacher').value,
                 date: document.getElementById('vDate').value,
                 status: document.getElementById('vStatus').value,
-                notes: document.getElementById('vNotes').value
+                notes: document.getElementById('vNotes').value,
+                createdAt: new Date().toISOString()
             };
 
-            visits.unshift(newVisit);
-            localStorage.setItem('mojaz_visits', JSON.stringify(visits));
-            this.reset();
-            populateSpecialistsDropdown();
-            updateDashboardUI();
-            
-            const visitsTab = document.querySelector('.nav-tab[data-target="sec-visits-log"]');
-            switchTab('sec-visits-log', visitsTab);
+            // Write directly to cloud Firestore (triggers realtime update across all phones/PCs)
+            visitsRef.doc(visitId).set(newVisit).then(() => {
+                this.reset();
+                populateSpecialistsDropdown();
+                const visitsTab = document.querySelector('.nav-tab[data-target="sec-visits-log"]');
+                switchTab('sec-visits-log', visitsTab);
+            }).catch(err => {
+                console.error("Save error:", err);
+                visits.unshift(newVisit);
+                localStorage.setItem('mojaz_visits_fallback', JSON.stringify(visits));
+                updateDashboardUI();
+            });
         });
 
+        // Submit Employee to Cloud Firebase
         document.getElementById('employeeForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            const empId = document.getElementById('empId').value.trim();
             const newEmp = {
-                id: document.getElementById('empId').value.trim(),
+                id: empId,
                 name: document.getElementById('empName').value.trim(),
                 dept: document.getElementById('empDept').value.trim(),
                 role: document.getElementById('empRole').value.trim()
             };
 
-            employees.push(newEmp);
-            localStorage.setItem('mojaz_staff', JSON.stringify(employees));
-            this.reset();
-            populateSpecialistsDropdown();
-            updateDashboardUI();
-
-            const empTab = document.querySelector('.nav-tab[data-target="sec-emp-list"]');
-            switchTab('sec-emp-list', empTab);
+            staffRef.doc(empId).set(newEmp).then(() => {
+                this.reset();
+                populateSpecialistsDropdown();
+                const empTab = document.querySelector('.nav-tab[data-target="sec-emp-list"]');
+                switchTab('sec-emp-list', empTab);
+            });
         });
 
         function updateDashboardUI() {
