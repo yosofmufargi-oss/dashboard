@@ -398,7 +398,7 @@
     </div>
 
     <script>
-        // 🔥 Firebase Configuration (المفاتيح الخاصة بمشروعك الحقيقي)
+        // 🔥 Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBqZ63RIICnD0m_bA1MjDgdfzvHySRhyg8",
             authDomain: "my-dashboard-d7600.firebaseapp.com",
@@ -419,15 +419,17 @@
         const staffRef = db.collection('artifacts').doc('mojaz-dashboard').collection('staff');
         const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
 
-        // Default Staff Roster
+        // Full Staff Roster (جميع الموظفين التسعة)
         const defaultEmployees = [
             { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
-            { id: '1686553', name: 'إبراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
-            { id: '16128287', name: 'فاطمة سالم هدوب معيوف المغيرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الفيزياء أول' },
+            { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
+            { id: '16128287', name: 'فاطمه سالم هدوب معيوف المغيرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مادة الفيزياء أول' },
             { id: '16119223', name: 'نصراء بنت مبارك بن سلطان', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة تقنية المعلومات أول' },
             { id: '16128341', name: 'وليد بن مالك بن محمد الجهضمي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الأحياء أول' },
-            { id: '16177726', name: 'أفراح بنت مبارك بن ناجم الحجرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال ثان' },
-            { id: '1682354', name: 'علي بن صابح الحجري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات' }
+            { id: '16177726', name: 'أفراح بنت مبارك بن ناجم الحجرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مجال ثان' },
+            { id: '1682354', name: 'علي بن صابح الحجري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات' },
+            { id: '16125432', name: 'سالم بن حمد البوسعيدي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الكيمياء' },
+            { id: '16139876', name: 'مريم بنت راشد المعمرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' }
         ];
 
         let employees = [...defaultEmployees];
@@ -443,31 +445,33 @@
                 .toLowerCase();
         }
 
-        // Real-time Cloud Firestore Listeners
+        // Real-time Cloud Firestore Listeners with Auto-Merge
         function listenToCloudUpdates() {
-            // Listen to Staff Collection
             staffRef.onSnapshot(snapshot => {
-                const cloudStaff = [];
-                snapshot.forEach(doc => cloudStaff.push(doc.data()));
+                const cloudStaffMap = new Map();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data && data.id) cloudStaffMap.set(data.id, data);
+                });
                 
-                if (cloudStaff.length === 0) {
-                    // Seed default employees if cloud is empty
-                    defaultEmployees.forEach(emp => staffRef.doc(emp.id).set(emp));
-                    employees = [...defaultEmployees];
-                } else {
-                    employees = cloudStaff;
-                }
-                
+                // Merge default staff with cloud staff to ensure no one disappears
+                defaultEmployees.forEach(defaultEmp => {
+                    if (!cloudStaffMap.has(defaultEmp.id)) {
+                        cloudStaffMap.set(defaultEmp.id, defaultEmp);
+                        staffRef.doc(defaultEmp.id).set(defaultEmp).catch(e => console.log(e));
+                    }
+                });
+
+                employees = Array.from(cloudStaffMap.values());
                 renderEmployees();
                 populateSpecialistDropdown();
                 updateStats();
             }, err => {
-                console.warn("Firestore access error, falling back to local list:", err);
+                console.warn("Firestore access error, rendering offline roster:", err);
                 renderEmployees();
                 populateSpecialistDropdown();
             });
 
-            // Listen to Visits Collection
             visitsRef.onSnapshot(snapshot => {
                 const cloudVisits = [];
                 snapshot.forEach(doc => cloudVisits.push(doc.data()));
@@ -666,6 +670,9 @@
         function initApp() {
             listenToCloudUpdates();
         }
+
+        // Run sync initially
+        listenToCloudUpdates();
     </script>
 </body>
 </html>
