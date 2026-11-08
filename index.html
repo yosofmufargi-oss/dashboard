@@ -219,7 +219,7 @@
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
-                        <span id="syncStatus">مؤشرات الميدان المباشرة (حفظ واستعادة دائمة)</span>
+                        <span id="syncStatus">مؤشرات الميدان المباشرة (مزامنة سحابية غير مكررة)</span>
                     </div>
                     <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="liveTime">
                         نظام موجز السحابي
@@ -431,7 +431,6 @@
         const staffRef = db.collection('artifacts').doc('mojaz-dashboard').collection('staff');
         const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
 
-        // 📋 القائمة الرسمية المحدثة بالكامل لـ 17 أخصائي وموظف وفق الملفات الرسمية المرفقة
         const defaultEmployees = [
             { id: 'admin', name: 'admin مدير النظام', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'مشرف عام النظام' },
             { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
@@ -560,6 +559,7 @@
             });
         });
 
+        // 🔄 حفظ البيانات مع تفريغ الحقول التلقائي فوراً بعد الضغط على زر الحفظ
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const visitId = Date.now().toString();
@@ -584,8 +584,11 @@
             updateStats();
 
             visitsRef.doc(visitId).set(newVisit).then(() => {
-                alert('تم حفظ الزيارة الميدانية بالسحابة!');
+                alert('تم حفظ الزيارة الميدانية بالسحابة بنجاح!');
+                // تفريغ كافة خانات النموذج تلقائياً
                 document.getElementById('visitForm').reset();
+            }).catch(err => {
+                alert('حدث خطأ أثناء الحفظ بالسحابة: ' + err.message);
             });
         });
 
