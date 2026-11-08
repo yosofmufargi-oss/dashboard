@@ -46,6 +46,8 @@
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; width: 100%; }
         .btn-primary { background-color: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25); }
         .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-success { background-color: var(--success); color: #ffffff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+        .btn-success:hover { background-color: #059669; }
         .btn-logout { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 8px 16px; width: auto; border-radius: 8px; font-weight: 700; }
         .btn-logout:hover { background-color: var(--danger); color: #ffffff; }
         .btn-del { background-color: #fee2e2; color: #b91c1c; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
@@ -80,6 +82,10 @@
         .tab-section.active { display: block; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .filter-bar { background: #ffffff; border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 10px; }
+        .filter-group label { font-weight: 800; font-size: 14px; color: var(--primary); }
 
         .live-pulse-strip { background: #ffffff; border-radius: 12px; padding: 12px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
         .pulse-indicator { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--text-dark); }
@@ -198,6 +204,19 @@
 
         <div class="main-content">
             <div id="sec-stats" class="tab-section active">
+                
+                <!-- 🎯 شريط الفرز حسب القسم -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>🎯 عرض إحصائيات القسم:</label>
+                        <select id="departmentFilter" class="form-control" style="width: auto; min-width: 320px;" onchange="updateStats()">
+                            <option value="جميع الأقسام">جميع الأقسام</option>
+                            <option value="قسم تقويم تعلم مواد العلوم التطبيقية">قسم تقويم تعلم مواد العلوم التطبيقية</option>
+                            <option value="قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية">قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
@@ -306,12 +325,17 @@
 
             <div id="sec-visits-log" class="tab-section">
                 <div class="table-card">
-                    <h3>📜 سجل الزيارات المسجلة</h3>
+                    <h3>
+                        <span>📜 سجل الزيارات المسجلة</span>
+                        <!-- 📊 زر تصدير الملاحظات لـ Excel -->
+                        <button class="btn btn-success" style="width: auto; padding: 8px 16px;" onclick="exportVisitsToCSV()">📥 تصدير الملاحظات (Excel)</button>
+                    </h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
                                 <tr>
                                     <th>الأخصائي</th>
+                                    <th>القسم</th>
                                     <th>المدرسة</th>
                                     <th>المعلم</th>
                                     <th>التاريخ</th>
@@ -341,7 +365,10 @@
                             </div>
                             <div class="form-group">
                                 <label>القسم</label>
-                                <input type="text" id="empDept" class="form-control" placeholder="قسم تقويم تعلم..." required>
+                                <select id="empDept" class="form-control" required>
+                                    <option value="قسم تقويم تعلم مواد العلوم التطبيقية">قسم تقويم تعلم مواد العلوم التطبيقية</option>
+                                    <option value="قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية">قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>المسمى الوظيفي</label>
@@ -355,7 +382,7 @@
 
             <div id="sec-emp-list" class="tab-section">
                 <div class="table-card">
-                    <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول (17 موظفاً)</h3>
+                    <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
@@ -407,7 +434,7 @@
         const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
 
         const defaultEmployees = [
-            { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
+            { id: 'admin', name: 'admin مدير النظام', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'مشرف عام النظام' },
             { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
             { id: '16128287', name: 'فاطمه سالم هدوب معيوف المغيرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مادة الفيزياء أول' },
             { id: '16119223', name: 'نصراء بنت مبارك بن سلطان', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة تقنية المعلومات أول' },
@@ -415,15 +442,15 @@
             { id: '16177726', name: 'أفراح بنت مبارك بن ناجم الحجرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مجال ثان' },
             { id: '1682354', name: 'علي بن صابح الحجري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات' },
             { id: '16125432', name: 'سالم بن حمد البوسعيدي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الكيمياء' },
-            { id: '16139876', name: 'مريم بنت راشد المعمرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' },
+            { id: '16139876', name: 'مريم بنت راشد المعمرية', dept: 'قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية', role: 'أخصائي تقويم مجال أول' },
             { id: '16140012', name: 'خالد بن أحمد بن سعيد الإسماعيلي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات أول' },
             { id: '16151123', name: 'شيخة بنت حمود بن عامر الحارثية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الفيزياء' },
             { id: '16162234', name: 'راشد بن محمد بن سالم الهاشمي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الأحياء' },
-            { id: '16173345', name: 'منى بنت خلفان بن سيف السعدية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال ثان' },
+            { id: '16173345', name: 'منى بنت خلفان بن سيف السعدية', dept: 'قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية', role: 'أخصائي تقويم مجال ثان' },
             { id: '16184456', name: 'حمود بن ناصر بن خلفان المعمري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الكيمياء' },
             { id: '16195567', name: 'عائشة بنت عبدالله بن سعيد العامرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة تقنية المعلومات' },
-            { id: '16206678', name: 'يحيى بن سليمان بن علي الفرعي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة العلوم العامة' },
-            { id: '16217789', name: 'زينب بنت سيف بن مطر الرواحية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' }
+            { id: '16206678', name: 'يحيى بن سليمان بن علي الفرعي', dept: 'قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية', role: 'أخصائي تقويم مادة العلوم العامة' },
+            { id: '16217789', name: 'زينب بنت سيف بن مطر الرواحية', dept: 'قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية', role: 'أخصائي تقويم مجال أول' }
         ];
 
         let employees = [...defaultEmployees];
@@ -437,7 +464,6 @@
             return text.trim().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').toLowerCase();
         }
 
-        // Real-time listener without duplicate triggers
         function listenToCloudUpdates() {
             if (isListening) return;
             isListening = true;
@@ -462,9 +488,8 @@
                 updateStats();
             });
 
-            // Clean visits fetching without duplication
             visitsRef.onSnapshot(snapshot => {
-                visits = []; // Empty visits list to avoid stacking/duplication
+                visits = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data) visits.push({ id: doc.id, ...data });
@@ -517,7 +542,7 @@
             const newEmp = {
                 id: document.getElementById('empId').value.trim(),
                 name: document.getElementById('empName').value.trim(),
-                dept: document.getElementById('empDept').value.trim(),
+                dept: document.getElementById('empDept').value,
                 role: document.getElementById('empRole').value.trim()
             };
 
@@ -527,12 +552,18 @@
             });
         });
 
+        // 1️⃣ حفظ وتفريغ الاستمارة تلقائياً
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const visitId = Date.now().toString();
+            const specialistName = document.getElementById('vSpecialist').value;
+            const empObj = employees.find(e => e.name === specialistName);
+            const departmentName = empObj ? empObj.dept : 'غير محدد';
+
             const newVisit = {
                 id: visitId,
-                specialist: document.getElementById('vSpecialist').value,
+                specialist: specialistName,
+                dept: departmentName,
                 school: document.getElementById('vSchool').value.trim(),
                 teacher: document.getElementById('vTeacher').value.trim(),
                 date: document.getElementById('vDate').value,
@@ -542,17 +573,42 @@
 
             visitsRef.doc(visitId).set(newVisit).then(() => {
                 alert('تم حفظ الزيارة الميدانية بالسحابة!');
+                // تفريغ كافة الحانات في الناموذج
                 document.getElementById('visitForm').reset();
             });
         });
 
-        // Delete Visit function to easily clean duplicate entries
         function deleteVisit(id) {
-            if (confirm('هل أنت متأكد من حذف هذه الزيارة المكررة؟')) {
+            if (confirm('هل أنت متأكد من حذف هذه الزيارة؟')) {
                 visitsRef.doc(id).delete().then(() => {
                     alert('تم حذف الزيارة بنجاح!');
                 });
             }
+        }
+
+        // 2️⃣ تصدير الملاحظات وسجل الزيارات إلى CSV (Excel)
+        function exportVisitsToCSV() {
+            if (visits.length === 0) {
+                alert('لا توجد زيارات مسجلة لتصديرها!');
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM لضمان فتح اللغة العربية بشكل صحيح بـ Excel
+            csvContent += "الأخصائي,القسم,المدرسة,المعلم,التاريخ,الحالة,الملاحظات والتوصيات\n";
+
+            visits.forEach(v => {
+                const notesCleaned = `"${(v.notes || '').replace(/"/g, '""')}"`;
+                csvContent += `"${v.specialist}","${v.dept || ''}","${v.school}","${v.teacher}","${v.date}","${v.status}",${notesCleaned}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `سجل_زيارات_لوحة_موجز_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function renderEmployees() {
@@ -576,7 +632,7 @@
             const select = document.getElementById('vSpecialist');
             select.innerHTML = '<option value="">اختر الأخصائي...</option>';
             employees.forEach(emp => {
-                select.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
+                select.innerHTML += `<option value="${emp.name}">${emp.name} (${emp.dept})</option>`;
             });
         }
 
@@ -588,6 +644,7 @@
                 tbody.innerHTML += `
                     <tr>
                         <td>${v.specialist}</td>
+                        <td><small style="color:var(--text-muted);">${v.dept || 'غير محدد'}</small></td>
                         <td>${v.school}</td>
                         <td>${v.teacher}</td>
                         <td>${v.date}</td>
@@ -599,11 +656,23 @@
             });
         }
 
+        // 3️⃣ تصفية وفرز الإحصائيات بناءً على القسم المختارة
         function updateStats() {
-            const total = visits.length;
-            const urgent = visits.filter(v => v.status === 'عاجلة').length;
-            const stable = visits.filter(v => v.status === 'مستقرة').length;
-            const staffCount = employees.length;
+            const selectedDept = document.getElementById('departmentFilter').value;
+
+            // فلترة الزيارات والموظفين حسب القسم المختارة
+            let filteredVisits = visits;
+            let filteredEmployees = employees;
+
+            if (selectedDept !== 'جميع الأقسام') {
+                filteredVisits = visits.filter(v => v.dept === selectedDept);
+                filteredEmployees = employees.filter(e => e.dept === selectedDept);
+            }
+
+            const total = filteredVisits.length;
+            const urgent = filteredVisits.filter(v => v.status === 'عاجلة').length;
+            const stable = filteredVisits.filter(v => v.status === 'مستقرة').length;
+            const staffCount = filteredEmployees.length;
 
             document.getElementById('totalVisits').innerText = total;
             document.getElementById('urgentVisits').innerText = urgent;
@@ -613,7 +682,7 @@
             document.getElementById('pUrgentVisits').style.width = total ? `${(urgent / total) * 100}%` : '0%';
             document.getElementById('pStableVisits').style.width = total ? `${(stable / total) * 100}%` : '0%';
 
-            renderCharts(visits);
+            renderCharts(filteredVisits);
         }
 
         function renderCharts(visitsData) {
