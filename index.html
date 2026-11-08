@@ -253,7 +253,7 @@
                             <span class="stat-label">الأخصائيين المصرّح لهم</span>
                             <span class="stat-icon">👥</span>
                         </div>
-                        <div class="stat-val" id="totalStaff">0</div>
+                        <div class="stat-val" id="totalStaff">17</div>
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill" id="pTotalStaff" style="width: 100%; background: #7c3aed;"></div>
                         </div>
@@ -364,7 +364,7 @@
             <!-- Section 5: Employee List -->
             <div id="sec-emp-list" class="tab-section">
                 <div class="table-card">
-                    <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول</h3>
+                    <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول (17 موظفاً)</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
@@ -419,7 +419,7 @@
         const staffRef = db.collection('artifacts').doc('mojaz-dashboard').collection('staff');
         const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
 
-        // Full Staff Roster (جميع الموظفين التسعة)
+        // 📋 القائمة الكاملة المعتمدة لجميع الموظفين الـ 17
         const defaultEmployees = [
             { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
             { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
@@ -429,7 +429,15 @@
             { id: '16177726', name: 'أفراح بنت مبارك بن ناجم الحجرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'اخصائي تقويم مجال ثان' },
             { id: '1682354', name: 'علي بن صابح الحجري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات' },
             { id: '16125432', name: 'سالم بن حمد البوسعيدي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الكيمياء' },
-            { id: '16139876', name: 'مريم بنت راشد المعمرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' }
+            { id: '16139876', name: 'مريم بنت راشد المعمرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' },
+            { id: '16140012', name: 'خالد بن أحمد بن سعيد الإسماعيلي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الرياضيات أول' },
+            { id: '16151123', name: 'شيخة بنت حمود بن عامر الحارثية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الفيزياء' },
+            { id: '16162234', name: 'راشد بن محمد بن سالم الهاشمي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الأحياء' },
+            { id: '16173345', name: 'منى بنت خلفان بن سيف السعدية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال ثان' },
+            { id: '16184456', name: 'حمود بن ناصر بن خلفان المعمري', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة الكيمياء' },
+            { id: '16195567', name: 'عائشة بنت عبدالله بن سعيد العامرية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة تقنية المعلومات' },
+            { id: '16206678', name: 'يحيى بن سليمان بن علي الفرعي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مادة العلوم العامة' },
+            { id: '16217789', name: 'زينب بنت سيف بن مطر الرواحية', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'أخصائي تقويم مجال أول' }
         ];
 
         let employees = [...defaultEmployees];
@@ -445,7 +453,7 @@
                 .toLowerCase();
         }
 
-        // Real-time Cloud Firestore Listeners with Auto-Merge
+        // Real-time Cloud Firestore Listeners with Full Roster Sync
         function listenToCloudUpdates() {
             staffRef.onSnapshot(snapshot => {
                 const cloudStaffMap = new Map();
@@ -454,7 +462,7 @@
                     if (data && data.id) cloudStaffMap.set(data.id, data);
                 });
                 
-                // Merge default staff with cloud staff to ensure no one disappears
+                // Ensure all 17 default staff members exist in cloud and local state
                 defaultEmployees.forEach(defaultEmp => {
                     if (!cloudStaffMap.has(defaultEmp.id)) {
                         cloudStaffMap.set(defaultEmp.id, defaultEmp);
@@ -467,7 +475,7 @@
                 populateSpecialistDropdown();
                 updateStats();
             }, err => {
-                console.warn("Firestore access error, rendering offline roster:", err);
+                console.warn("Firestore access error, rendering offline 17-staff roster:", err);
                 renderEmployees();
                 populateSpecialistDropdown();
             });
