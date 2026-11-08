@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موجز - لوحة أخصائي تقويم المواد الميدانية (مزامنة سحابية)</title>
+    <title>موجز - لوحة أخصائي تقويم المواد الميدانية (مزامنة دائمية)</title>
     <!-- Chart.js for Dashboards -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -205,7 +205,6 @@
         <div class="main-content">
             <div id="sec-stats" class="tab-section active">
                 
-                <!-- 🎯 شريط الفرز حسب القسم -->
                 <div class="filter-bar">
                     <div class="filter-group">
                         <label>🎯 عرض إحصائيات القسم:</label>
@@ -220,7 +219,7 @@
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
-                        <span id="syncStatus">مؤشرات الميدان المباشرة (مزامنة سحابية غير مكررة)</span>
+                        <span id="syncStatus">مؤشرات الميدان المباشرة (حفظ واستعادة دائمة)</span>
                     </div>
                     <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="liveTime">
                         نظام موجز السحابي
@@ -327,7 +326,6 @@
                 <div class="table-card">
                     <h3>
                         <span>📜 سجل الزيارات المسجلة</span>
-                        <!-- 📊 زر تصدير الملاحظات لـ Excel -->
                         <button class="btn btn-success" style="width: auto; padding: 8px 16px;" onclick="exportVisitsToCSV()">📥 تصدير الملاحظات (Excel)</button>
                     </h3>
                     <div style="overflow-x: auto;">
@@ -453,8 +451,9 @@
             { id: '16217789', name: 'زينب بنت سيف بن مطر الرواحية', dept: 'قسم تقويم تعلم مواد العلوم الإنسانية والمهارات الفردية', role: 'أخصائي تقويم مجال أول' }
         ];
 
-        let employees = [...defaultEmployees];
-        let visits = [];
+        // الاستعادة الفورية للبيانات المحفوظة محلياً لمنع التصفير مطلقاً
+        let employees = JSON.parse(localStorage.getItem('mojaz_employees_saved')) || [...defaultEmployees];
+        let visits = JSON.parse(localStorage.getItem('mojaz_visits_saved')) || [];
         let deptChartInstance = null;
         let statusChartInstance = null;
         let isListening = false;
@@ -464,12 +463,15 @@
             return text.trim().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').toLowerCase();
         }
 
+        // الاستماع المباشر للسحابة وإزالة التكرارات
         function listenToCloudUpdates() {
             if (isListening) return;
             isListening = true;
 
             staffRef.onSnapshot(snapshot => {
                 const cloudStaffMap = new Map();
+                
+                // جلب بيانات الموظفين
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if (data && data.id) cloudStaffMap.set(data.id, data);
@@ -478,22 +480,30 @@
                 defaultEmployees.forEach(defaultEmp => {
                     if (!cloudStaffMap.has(defaultEmp.id)) {
                         cloudStaffMap.set(defaultEmp.id, defaultEmp);
-                        staffRef.doc(defaultEmp.id).set(defaultEmp).catch(e => console.log(e));
                     }
                 });
 
                 employees = Array.from(cloudStaffMap.values());
+                localStorage.setItem('mojaz_employees_saved', JSON.stringify(employees));
                 renderEmployees();
                 populateSpecialistDropdown();
                 updateStats();
             });
 
             visitsRef.onSnapshot(snapshot => {
-                visits = [];
+                const visitsMap = new Map();
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data) visits.push({ id: doc.id, ...data });
+                    if (data) {
+                        const visitId = doc.id || data.id;
+                        visitsMap.set(visitId, { id: visitId, ...data });
+                    }
                 });
+
+                visits = Array.from(visitsMap.values());
+                // حفظ نسخة دائمية بالمتصفح لمنع التصفير عند الخروج
+                localStorage.setItem('mojaz_visits_saved', JSON.stringify(visits));
                 renderVisits();
                 updateStats();
             });
@@ -530,6 +540,7 @@
 
         function showLogoutModal() { document.getElementById('logoutModal').style.display = 'flex'; }
         function hideLogoutModal() { document.getElementById('logoutModal').style.display = 'none'; }
+        
         function logout() {
             hideLogoutModal();
             document.getElementById('dashboardApp').style.display = 'none';
@@ -546,13 +557,15 @@
                 role: document.getElementById('empRole').value.trim()
             };
 
+            employees.push(newEmp);
+            localStorage.setItem('mojaz_employees_saved', JSON.stringify(employees));
             staffRef.doc(newEmp.id).set(newEmp).then(() => {
                 alert('تمت إضافة الأخصائي بنجاح!');
                 document.getElementById('employeeForm').reset();
             });
         });
 
-        // 1️⃣ حفظ وتفريغ الاستمارة تلقائياً
+        // حفظ وتفريغ الاستمارة تلقائياً
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const visitId = Date.now().toString();
@@ -571,29 +584,39 @@
                 notes: document.getElementById('vNotes').value.trim()
             };
 
+            // حفظ ثنائي (محلي + سحابي)
+            visits.push(newVisit);
+            localStorage.setItem('mojaz_visits_saved', JSON.stringify(visits));
+            renderVisits();
+            updateStats();
+
             visitsRef.doc(visitId).set(newVisit).then(() => {
                 alert('تم حفظ الزيارة الميدانية بالسحابة!');
-                // تفريغ كافة الحانات في الناموذج
                 document.getElementById('visitForm').reset();
             });
         });
 
         function deleteVisit(id) {
             if (confirm('هل أنت متأكد من حذف هذه الزيارة؟')) {
+                visits = visits.filter(v => v.id !== id);
+                localStorage.setItem('mojaz_visits_saved', JSON.stringify(visits));
+                renderVisits();
+                updateStats();
+
                 visitsRef.doc(id).delete().then(() => {
                     alert('تم حذف الزيارة بنجاح!');
                 });
             }
         }
 
-        // 2️⃣ تصدير الملاحظات وسجل الزيارات إلى CSV (Excel)
+        // تصدير الملاحظات لـ Excel
         function exportVisitsToCSV() {
             if (visits.length === 0) {
                 alert('لا توجد زيارات مسجلة لتصديرها!');
                 return;
             }
 
-            let csvContent = "\uFEFF"; // UTF-8 BOM لضمان فتح اللغة العربية بشكل صحيح بـ Excel
+            let csvContent = "\uFEFF";
             csvContent += "الأخصائي,القسم,المدرسة,المعلم,التاريخ,الحالة,الملاحظات والتوصيات\n";
 
             visits.forEach(v => {
@@ -656,11 +679,9 @@
             });
         }
 
-        // 3️⃣ تصفية وفرز الإحصائيات بناءً على القسم المختارة
         function updateStats() {
             const selectedDept = document.getElementById('departmentFilter').value;
 
-            // فلترة الزيارات والموظفين حسب القسم المختارة
             let filteredVisits = visits;
             let filteredEmployees = employees;
 
@@ -729,9 +750,18 @@
         }
 
         function initApp() {
+            renderEmployees();
+            populateSpecialistDropdown();
+            renderVisits();
+            updateStats();
             listenToCloudUpdates();
         }
 
+        // تشغيل البداية فور تحميل الصفحة
+        renderEmployees();
+        populateSpecialistDropdown();
+        renderVisits();
+        updateStats();
         listenToCloudUpdates();
     </script>
 </body>
