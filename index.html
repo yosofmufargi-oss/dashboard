@@ -29,7 +29,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* Login Screen */
         .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 20px; }
         .login-card { background: var(--card-bg); padding: 40px 30px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); width: 100%; max-width: 420px; text-align: center; }
         .login-header-org { display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 16px; }
@@ -49,9 +48,10 @@
         .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
         .btn-logout { background-color: #fef2f2; color: var(--danger); border: 1px solid #fecaca; padding: 8px 16px; width: auto; border-radius: 8px; font-weight: 700; }
         .btn-logout:hover { background-color: var(--danger); color: #ffffff; }
+        .btn-del { background-color: #fee2e2; color: #b91c1c; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-del:hover { background-color: #ef4444; color: white; }
         .error-msg { color: var(--danger); font-size: 13px; margin-top: 12px; display: none; background: #fef2f2; padding: 10px; border-radius: 8px; border: 1px solid #fecaca; }
 
-        /* Dashboard Container */
         .dashboard-container { display: none; flex-direction: column; min-height: 100vh; }
         header { background-color: var(--card-bg); border-bottom: 1px solid var(--border); padding: 16px 28px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .header-right { display: flex; align-items: center; gap: 14px; }
@@ -65,7 +65,6 @@
         .user-name { font-weight: 800; color: var(--text-dark); }
         .user-role { color: var(--text-muted); font-size: 11px; }
 
-        /* Navigation Tabs */
         .nav-bar { background: #ffffff; border-bottom: 2px solid var(--border); display: flex; gap: 14px; padding: 16px 28px; overflow-x: auto; box-shadow: inset 0 -2px 5px rgba(0,0,0,0.03); }
         .nav-tab { display: flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 800; color: #ffffff; cursor: pointer; white-space: nowrap; user-select: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; top: 0; }
         .nav-tab[data-target="sec-stats"] { background: linear-gradient(135deg, #1e3a8a, #2563eb); border: 1px solid #1d4ed8; box-shadow: 0 5px 0 #1e293b, 0 6px 12px rgba(37, 99, 235, 0.3); }
@@ -116,7 +115,6 @@
 
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 18px; }
 
-        /* Modal Styles */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: var(--card-bg); padding: 28px; border-radius: 18px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         .modal-actions { display: flex; gap: 12px; margin-top: 22px; }
@@ -180,7 +178,6 @@
             </div>
         </header>
 
-        <!-- 3D Navigation Tabs -->
         <nav class="nav-bar">
             <div class="nav-tab active" data-target="sec-stats" onclick="switchTab('sec-stats', this)">
                 <span>📊</span> الإحصائيات العامة
@@ -200,14 +197,11 @@
         </nav>
 
         <div class="main-content">
-
-            <!-- Section 1: Infographics & Live Pulse Stats -->
             <div id="sec-stats" class="tab-section active">
-                
                 <div class="live-pulse-strip">
                     <div class="pulse-indicator">
                         <div class="dot-pulse"></div>
-                        <span id="syncStatus">مؤشرات الميدان المباشرة (مزامنة سحابية لحظية)</span>
+                        <span id="syncStatus">مؤشرات الميدان المباشرة (مزامنة سحابية غير مكررة)</span>
                     </div>
                     <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="liveTime">
                         نظام موجز السحابي
@@ -272,7 +266,6 @@
                 </div>
             </div>
 
-            <!-- Section 2: Add Visit Form -->
             <div id="sec-add-visit" class="tab-section">
                 <div class="table-card">
                     <h3>📝 تسجيل زيارة ميدانية جديدة</h3>
@@ -311,10 +304,9 @@
                 </div>
             </div>
 
-            <!-- Section 3: Visits Log -->
             <div id="sec-visits-log" class="tab-section">
                 <div class="table-card">
-                    <h3>📜 سجل الزيارات المسجلة (مزامنة مباشرة)</h3>
+                    <h3>📜 سجل الزيارات المسجلة</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
@@ -325,6 +317,7 @@
                                     <th>التاريخ</th>
                                     <th>الحالة</th>
                                     <th>الملاحظات</th>
+                                    <th>إجراءات</th>
                                 </tr>
                             </thead>
                             <tbody id="visitsTableBody"></tbody>
@@ -333,7 +326,6 @@
                 </div>
             </div>
 
-            <!-- Section 4: Add Employee -->
             <div id="sec-add-emp" class="tab-section">
                 <div class="table-card">
                     <h3>➕ إضافة أخصائي / موظف مصرح له جديد</h3>
@@ -361,7 +353,6 @@
                 </div>
             </div>
 
-            <!-- Section 5: Employee List -->
             <div id="sec-emp-list" class="tab-section">
                 <div class="table-card">
                     <h3>👥 قائمة الموظفين والأخصائيين المصرح لهم بالدخول (17 موظفاً)</h3>
@@ -369,8 +360,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>اسم المستخدم (الاسم الأول)</th>
-                                    <th>الرقم الوظيفي (كلمة المرور)</th>
+                                    <th>اسم المستخدم</th>
+                                    <th>الرقم الوظيفي</th>
                                     <th>الاسم الكامل</th>
                                     <th>القسم</th>
                                     <th>المسمى الوظيفي</th>
@@ -381,7 +372,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -398,7 +388,6 @@
     </div>
 
     <script>
-        // 🔥 Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBqZ63RIICnD0m_bA1MjDgdfzvHySRhyg8",
             authDomain: "my-dashboard-d7600.firebaseapp.com",
@@ -409,17 +398,14 @@
             appId: "1:727225174282:web:bb2d7eb24023c0b11452f3"
         };
 
-        // Initialize Firebase
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.firestore();
 
-        // Database References
         const staffRef = db.collection('artifacts').doc('mojaz-dashboard').collection('staff');
         const visitsRef = db.collection('artifacts').doc('mojaz-dashboard').collection('visits');
 
-        // 📋 القائمة الكاملة المعتمدة لجميع الموظفين الـ 17
         const defaultEmployees = [
             { id: 'admin', name: 'admin مدير النظام', dept: 'دائرة القياس والتقويم التربوي', role: 'مشرف عام النظام' },
             { id: '1686553', name: 'ابراهيم بدر سيف سعود الشبيبي', dept: 'قسم تقويم تعلم مواد العلوم التطبيقية', role: 'رئيس قسم' },
@@ -444,17 +430,18 @@
         let visits = [];
         let deptChartInstance = null;
         let statusChartInstance = null;
+        let isListening = false;
 
         function normalizeArabic(text) {
             if (!text) return '';
-            return text.trim()
-                .replace(/[أإآ]/g, 'ا')
-                .replace(/ة/g, 'ه')
-                .toLowerCase();
+            return text.trim().replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').toLowerCase();
         }
 
-        // Real-time Cloud Firestore Listeners with Full Roster Sync
+        // Real-time listener without duplicate triggers
         function listenToCloudUpdates() {
+            if (isListening) return;
+            isListening = true;
+
             staffRef.onSnapshot(snapshot => {
                 const cloudStaffMap = new Map();
                 snapshot.forEach(doc => {
@@ -462,7 +449,6 @@
                     if (data && data.id) cloudStaffMap.set(data.id, data);
                 });
                 
-                // Ensure all 17 default staff members exist in cloud and local state
                 defaultEmployees.forEach(defaultEmp => {
                     if (!cloudStaffMap.has(defaultEmp.id)) {
                         cloudStaffMap.set(defaultEmp.id, defaultEmp);
@@ -474,24 +460,20 @@
                 renderEmployees();
                 populateSpecialistDropdown();
                 updateStats();
-            }, err => {
-                console.warn("Firestore access error, rendering offline 17-staff roster:", err);
-                renderEmployees();
-                populateSpecialistDropdown();
             });
 
+            // Clean visits fetching without duplication
             visitsRef.onSnapshot(snapshot => {
-                const cloudVisits = [];
-                snapshot.forEach(doc => cloudVisits.push(doc.data()));
-                visits = cloudVisits;
+                visits = []; // Empty visits list to avoid stacking/duplication
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data) visits.push({ id: doc.id, ...data });
+                });
                 renderVisits();
                 updateStats();
-            }, err => {
-                console.warn("Firestore visits error:", err);
             });
         }
 
-        // Handle Login Form
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const username = normalizeArabic(document.getElementById('usernameInput').value);
@@ -530,7 +512,6 @@
             document.getElementById('loginForm').reset();
         }
 
-        // Save Employee to Cloud
         document.getElementById('employeeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const newEmp = {
@@ -541,14 +522,11 @@
             };
 
             staffRef.doc(newEmp.id).set(newEmp).then(() => {
-                alert('تمت إضافة الأخصائي وحفظه في السحابة بنجاح!');
+                alert('تمت إضافة الأخصائي بنجاح!');
                 document.getElementById('employeeForm').reset();
-            }).catch(err => {
-                alert('حدث خطأ أثناء الحفظ بالسحابة: ' + err.message);
             });
         });
 
-        // Save Visit to Cloud
         document.getElementById('visitForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const visitId = Date.now().toString();
@@ -563,12 +541,19 @@
             };
 
             visitsRef.doc(visitId).set(newVisit).then(() => {
-                alert('تم حفظ الزيارة الميدانية ومزامنتها عبر جميع الأجهزة!');
+                alert('تم حفظ الزيارة الميدانية بالسحابة!');
                 document.getElementById('visitForm').reset();
-            }).catch(err => {
-                alert('حدث خطأ أثناء حفظ الزيارة: ' + err.message);
             });
         });
+
+        // Delete Visit function to easily clean duplicate entries
+        function deleteVisit(id) {
+            if (confirm('هل أنت متأكد من حذف هذه الزيارة المكررة؟')) {
+                visitsRef.doc(id).delete().then(() => {
+                    alert('تم حذف الزيارة بنجاح!');
+                });
+            }
+        }
 
         function renderEmployees() {
             const tbody = document.getElementById('employeesTableBody');
@@ -608,6 +593,7 @@
                         <td>${v.date}</td>
                         <td><span class="badge ${badgeClass}">${v.status}</span></td>
                         <td>${v.notes}</td>
+                        <td><button class="btn-del" onclick="deleteVisit('${v.id}')">حذف 🗑️</button></td>
                     </tr>
                 `;
             });
@@ -642,7 +628,6 @@
             const urgentCount = visitsData.filter(v => v.status === 'عاجلة').length;
             const stableCount = visitsData.filter(v => v.status === 'مستقرة').length;
 
-            // Bar Chart
             if (deptChartInstance) deptChartInstance.destroy();
             const ctx1 = document.getElementById('deptChart').getContext('2d');
             deptChartInstance = new Chart(ctx1, {
@@ -659,7 +644,6 @@
                 options: { responsive: true, plugins: { legend: { display: false } } }
             });
 
-            // Doughnut Chart
             if (statusChartInstance) statusChartInstance.destroy();
             const ctx2 = document.getElementById('statusChart').getContext('2d');
             statusChartInstance = new Chart(ctx2, {
@@ -679,7 +663,6 @@
             listenToCloudUpdates();
         }
 
-        // Run sync initially
         listenToCloudUpdates();
     </script>
 </body>
